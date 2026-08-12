@@ -33,3 +33,34 @@ import Testing
     let mapped = APIClient.mapError(data: Data("not json".utf8), statusCode: 500)
     #expect(mapped == .server("Something went wrong. Please try again. (500)"))
 }
+
+@Test func decodingErrorDescribesMissingKey() throws {
+    struct Sample: Decodable { let upvoteCount: Int }
+    do {
+        _ = try JSONDecoder().decode(Sample.self, from: Data("{}".utf8))
+        Issue.record("expected decoding to throw")
+    } catch {
+        #expect(APIError.describe(error) == "Missing field 'upvoteCount'")
+    }
+}
+
+@Test func decodingErrorDescribesTypeMismatch() throws {
+    struct Sample: Decodable { let upvoteCount: Int }
+    do {
+        _ = try JSONDecoder().decode(Sample.self, from: Data(#"{"upvoteCount":"forty-two"}"#.utf8))
+        Issue.record("expected decoding to throw")
+    } catch {
+        #expect(APIError.describe(error) == "Field 'upvoteCount' has the wrong type (expected Int)")
+    }
+}
+
+@Test func apiErrorDecodingExposesDebugDetail() {
+    let error = APIError.decoding("Missing field 'id'")
+    #expect(error.debugDetail == "Missing field 'id'")
+    #expect(error.userMessage == "Received an unexpected response. Please try again later.")
+}
+
+@Test func apiErrorOtherCasesHaveNoDebugDetail() {
+    #expect(APIError.invalidKey.debugDetail == nil)
+    #expect(APIError.network.debugDetail == nil)
+}

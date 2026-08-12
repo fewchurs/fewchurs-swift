@@ -56,7 +56,14 @@ public struct FeatureRequestBoardView: View {
             ContentUnavailableView {
                 Label("Something Went Wrong", systemImage: "exclamationmark.triangle")
             } description: {
-                Text(errorMessage)
+                VStack(spacing: 4) {
+                    Text(errorMessage)
+                    if let errorDetail = model.errorDetail {
+                        Text(errorDetail)
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
             } actions: {
                 Button("Retry") {
                     Task { await model.refresh() }

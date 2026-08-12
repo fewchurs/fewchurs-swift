@@ -8,6 +8,7 @@ struct SubmitFeatureView: View {
     @State private var description = ""
     @State private var isSubmitting = false
     @State private var errorMessage: String?
+    @State private var errorDetail: String?
 
     private let titleLimit = 80
     private let descriptionLimit = 500
@@ -53,6 +54,11 @@ struct SubmitFeatureView: View {
                         Text(errorMessage)
                             .font(.footnote)
                             .foregroundStyle(.red)
+                        if let errorDetail {
+                            Text(errorDetail)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
@@ -76,6 +82,7 @@ struct SubmitFeatureView: View {
 
     private func submit() {
         errorMessage = nil
+        errorDetail = nil
         isSubmitting = true
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         Task {
@@ -85,7 +92,9 @@ struct SubmitFeatureView: View {
                 dismiss()
             } catch {
                 isSubmitting = false
-                errorMessage = (error as? APIError)?.userMessage ?? APIError.network.userMessage
+                let apiError = (error as? APIError) ?? .network
+                errorMessage = apiError.userMessage
+                errorDetail = apiError.debugDetail
             }
         }
     }

@@ -19,6 +19,7 @@ final class FeatureBoardModel {
     private(set) var isLoading = false
     private(set) var isLoadingMore = false
     var errorMessage: String?
+    var errorDetail: String?
     var sort: FeatureSort = .top {
         didSet {
             guard oldValue != sort else { return }
@@ -48,13 +49,14 @@ final class FeatureBoardModel {
         guard !isLoadingMore, !isLoading, hasMore, let cursor = nextCursor else { return }
         isLoadingMore = true
         errorMessage = nil
+        errorDetail = nil
         do {
             let page: FeaturesPage = try await apiClient.send(.features(sort: sort.rawValue, limit: pageLimit, cursor: cursor))
             features.append(contentsOf: page.features)
             nextCursor = page.nextCursor
             hasMore = page.nextCursor != nil
         } catch {
-            errorMessage = Self.message(for: error)
+            setError(error)
         }
         isLoadingMore = false
     }
@@ -79,7 +81,7 @@ final class FeatureBoardModel {
             if let currentIndex = features.firstIndex(where: { $0.id == feature.id }) {
                 features[currentIndex] = original
             }
-            errorMessage = Self.message(for: error)
+            setError(error)
         }
     }
 
@@ -96,18 +98,21 @@ final class FeatureBoardModel {
     private func performFreshLoad() async {
         isLoading = true
         errorMessage = nil
+        errorDetail = nil
         do {
             let page: FeaturesPage = try await apiClient.send(.features(sort: sort.rawValue, limit: pageLimit, cursor: nil))
             features = page.features
             nextCursor = page.nextCursor
             hasMore = page.nextCursor != nil
         } catch {
-            errorMessage = Self.message(for: error)
+            setError(error)
         }
         isLoading = false
     }
 
-    private static func message(for error: Error) -> String {
-        (error as? APIError)?.userMessage ?? APIError.network.userMessage
+    private func setError(_ error: Error) {
+        let apiError = (error as? APIError) ?? .network
+        errorMessage = apiError.userMessage
+        errorDetail = apiError.debugDetail
     }
 }

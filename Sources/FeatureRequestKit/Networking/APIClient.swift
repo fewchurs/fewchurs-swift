@@ -53,7 +53,7 @@ actor APIClient {
         do {
             return try Self.decoder.decode(T.self, from: data)
         } catch {
-            throw APIError.decoding
+            throw APIError.decoding(APIError.describe(error))
         }
     }
 

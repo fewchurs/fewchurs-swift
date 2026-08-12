@@ -8,8 +8,17 @@ enum APIError: Error, LocalizedError, Equatable {
     case notFound
     case server(String)
     case network
-    case decoding
+    case decoding(String)
     case notConfigured
+
+    /// Technical detail for the cases that have one, meant for debugging during integration
+    /// rather than for end users. `nil` for cases where there's nothing more specific to show.
+    var debugDetail: String? {
+        switch self {
+        case .decoding(let detail): return detail
+        default: return nil
+        }
+    }
 
     var userMessage: String {
         switch self {
@@ -44,6 +53,30 @@ enum APIError: Error, LocalizedError, Equatable {
         case "rate_limited": return .rateLimited
         case "not_found": return .notFound
         default: return .server(message)
+        }
+    }
+
+    /// Turns a `DecodingError` into a short, actionable description of what didn't match
+    /// (missing key, wrong type, etc.), for surfacing during integration/debugging.
+    static func describe(_ error: Error) -> String {
+        guard let decodingError = error as? DecodingError else {
+            return error.localizedDescription
+        }
+        switch decodingError {
+        case .keyNotFound(let key, let context):
+            let path = (context.codingPath + [key]).map(\.stringValue).joined(separator: ".")
+            return "Missing field '\(path)'"
+        case .typeMismatch(let type, let context):
+            let path = context.codingPath.map(\.stringValue).joined(separator: ".")
+            return "Field '\(path)' has the wrong type (expected \(type))"
+        case .valueNotFound(let type, let context):
+            let path = context.codingPath.map(\.stringValue).joined(separator: ".")
+            return "Field '\(path)' is null (expected \(type))"
+        case .dataCorrupted(let context):
+            let path = context.codingPath.map(\.stringValue).joined(separator: ".")
+            return path.isEmpty ? context.debugDescription : "'\(path)': \(context.debugDescription)"
+        @unknown default:
+            return decodingError.localizedDescription
         }
     }
 }
