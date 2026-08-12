@@ -7,5 +7,5 @@ struct Configuration {
     var userId: String?
     var email: String?
 
-    static let defaultBaseURL = URL(string: "https://api.featurerequestkit.com/api/v1")!
+    static let defaultBaseURL = URL(string: "http://localhost:3000/api/v1")!
 }
