@@ -49,4 +49,35 @@ extension Endpoint {
     static func removeVote(featureId: String) -> Endpoint {
         Endpoint(path: "features/\(featureId)/vote", method: .delete)
     }
+
+    static func follow(featureId: String, email: String) throws -> Endpoint {
+        struct Body: Encodable {
+            let email: String
+        }
+        let data = try JSONEncoder().encode(Body(email: email))
+        return Endpoint(path: "features/\(featureId)/follow", method: .post, body: data)
+    }
+
+    static func unfollow(featureId: String) -> Endpoint {
+        Endpoint(path: "features/\(featureId)/follow", method: .delete)
+    }
+
+    static func comments(featureId: String, limit: Int, cursor: String?) -> Endpoint {
+        var items = [URLQueryItem(name: "limit", value: String(limit))]
+        if let cursor {
+            items.append(URLQueryItem(name: "cursor", value: cursor))
+        }
+        return Endpoint(path: "features/\(featureId)/comments", method: .get, queryItems: items)
+    }
+
+    static func createComment(featureId: String, text: String, authorName: String?) throws -> Endpoint {
+        struct Body: Encodable {
+            let text: String
+            let authorName: String?
+        }
+        let data = try JSONEncoder().encode(Body(text: text, authorName: authorName))
+        return Endpoint(path: "features/\(featureId)/comments", method: .post, body: data)
+    }
+
+    static let config = Endpoint(path: "config", method: .get)
 }

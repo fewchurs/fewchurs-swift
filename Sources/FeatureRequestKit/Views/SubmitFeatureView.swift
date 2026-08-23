@@ -6,6 +6,8 @@ struct SubmitFeatureView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var title = ""
     @State private var description = ""
+    @State private var email: String
+    @State private var isEditingEmail: Bool
     @State private var isSubmitting = false
     @State private var errorMessage: String?
     @State private var errorDetail: String?
@@ -15,6 +17,13 @@ struct SubmitFeatureView: View {
 
     private var canSubmit: Bool {
         title.trimmingCharacters(in: .whitespacesAndNewlines).count >= 3 && !isSubmitting
+    }
+
+    init(model: FeatureBoardModel) {
+        self.model = model
+        let savedEmail = UserIdentity.email ?? ""
+        _email = State(initialValue: savedEmail)
+        _isEditingEmail = State(initialValue: savedEmail.isEmpty)
     }
 
     var body: some View {
@@ -47,6 +56,27 @@ struct SubmitFeatureView: View {
                         .foregroundStyle(.secondary)
                 } header: {
                     Text("Description (optional)")
+                }
+
+                Section {
+                    if isEditingEmail {
+                        TextField("you@example.com", text: $email)
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                    } else {
+                        HStack {
+                            Text(email)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Button("Change") { isEditingEmail = true }
+                                .font(.caption)
+                        }
+                    }
+                } header: {
+                    Text("Email (optional)")
+                } footer: {
+                    Text("Want an email when this is added?")
                 }
 
                 if let errorMessage {
@@ -85,9 +115,17 @@ struct SubmitFeatureView: View {
         errorDetail = nil
         isSubmitting = true
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
         Task {
             do {
-                try await model.submit(title: trimmedTitle, description: description)
+                try await model.submit(
+                    title: trimmedTitle,
+                    description: description,
+                    email: trimmedEmail.isEmpty ? nil : trimmedEmail
+                )
+                if !trimmedEmail.isEmpty {
+                    UserIdentity.email = trimmedEmail
+                }
                 isSubmitting = false
                 dismiss()
             } catch {

@@ -3,6 +3,7 @@ import SwiftUI
 public struct FeatureRequestBoardView: View {
     @State private var model = FeatureBoardModel()
     @State private var isPresentingSubmit = false
+    @State private var pendingFollowFeature: FeatureRequest?
 
     public init() {}
 
@@ -25,6 +26,9 @@ public struct FeatureRequestBoardView: View {
             }
             .background(configuration.theme.background)
             .navigationTitle("Feature Requests")
+            .navigationDestination(for: String.self) { featureId in
+                FeatureDetailView(featureId: featureId, boardModel: model)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -38,13 +42,32 @@ public struct FeatureRequestBoardView: View {
             .sheet(isPresented: $isPresentingSubmit) {
                 SubmitFeatureView(model: model)
             }
+            .sheet(item: $pendingFollowFeature) { feature in
+                IdentityPromptSheet(kind: .email) { email in
+                    guard let email else { return }
+                    UserIdentity.email = email
+                    Task { await model.toggleFollow(feature, email: email) }
+                }
+            }
             .task {
-                await model.load()
+                async let loadFeatures: Void = model.load()
+                async let loadConfig: Void = model.loadConfig()
+                _ = await (loadFeatures, loadConfig)
             }
         }
         .environment(\.featureRequestTheme, configuration.theme)
         .tint(configuration.theme.accent)
         .preferredColorScheme(configuration.theme.forcesDarkAppearance ? .dark : nil)
+    }
+
+    private func handleFollowTapped(_ feature: FeatureRequest) {
+        if feature.isFollowing {
+            Task { await model.toggleFollow(feature, email: nil) }
+        } else if let email = UserIdentity.email {
+            Task { await model.toggleFollow(feature, email: email) }
+        } else {
+            pendingFollowFeature = feature
+        }
     }
 
     @ViewBuilder
@@ -82,8 +105,12 @@ public struct FeatureRequestBoardView: View {
         } else {
             List {
                 ForEach(model.features) { feature in
-                    FeatureRowView(feature: feature) {
-                        Task { await model.toggleVote(feature) }
+                    NavigationLink(value: feature.id) {
+                        FeatureRowView(feature: feature) {
+                            Task { await model.toggleVote(feature) }
+                        } onFollowTapped: {
+                            handleFollowTapped(feature)
+                        }
                     }
                     .onAppear {
                         if feature.id == model.features.last?.id {
@@ -101,6 +128,12 @@ public struct FeatureRequestBoardView: View {
                     }
                     .listRowSeparator(.hidden)
                     .listRowBackground(background)
+                }
+
+                if model.boardConfig.showBranding {
+                    PoweredByFooter()
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(background)
                 }
             }
             .listStyle(.plain)

@@ -49,3 +49,41 @@ private let baseURL = URL(string: "https://api.example.com/api/v1")!
     let json = try JSONSerialization.jsonObject(with: endpoint.body!) as! [String: Any]
     #expect(json["description"] as? String == "Please add it")
 }
+
+@Test func followEndpointEncodesEmailAndUsesPost() throws {
+    let endpoint = try Endpoint.follow(featureId: "feature-42", email: "me@example.com")
+    #expect(endpoint.method == .post)
+    #expect(endpoint.url(relativeTo: baseURL)?.absoluteString == "https://api.example.com/api/v1/features/feature-42/follow")
+    let json = try JSONSerialization.jsonObject(with: endpoint.body!) as! [String: Any]
+    #expect(json["email"] as? String == "me@example.com")
+}
+
+@Test func unfollowEndpointUsesDeleteMethod() {
+    let endpoint = Endpoint.unfollow(featureId: "feature-42")
+    #expect(endpoint.method == .delete)
+    #expect(endpoint.url(relativeTo: baseURL)?.absoluteString == "https://api.example.com/api/v1/features/feature-42/follow")
+}
+
+@Test func commentsEndpointBuildsURLWithLimitAndCursor() {
+    let endpoint = Endpoint.comments(featureId: "feature-42", limit: 50, cursor: "c9")
+    let url = endpoint.url(relativeTo: baseURL)
+    #expect(url?.absoluteString.hasPrefix("https://api.example.com/api/v1/features/feature-42/comments?") == true)
+    let components = URLComponents(url: url!, resolvingAgainstBaseURL: false)
+    let items = Dictionary(uniqueKeysWithValues: (components?.queryItems ?? []).map { ($0.name, $0.value) })
+    #expect(items["limit"] == "50")
+    #expect(items["cursor"] == "c9")
+}
+
+@Test func createCommentEndpointEncodesTextAndOptionalAuthorName() throws {
+    let endpoint = try Endpoint.createComment(featureId: "feature-42", text: "Nice!", authorName: nil)
+    #expect(endpoint.method == .post)
+    let json = try JSONSerialization.jsonObject(with: endpoint.body!) as! [String: Any]
+    #expect(json["text"] as? String == "Nice!")
+    #expect(json["authorName"] == nil)
+}
+
+@Test func configEndpointUsesGetAndFixedPath() {
+    let url = Endpoint.config.url(relativeTo: baseURL)
+    #expect(Endpoint.config.method == .get)
+    #expect(url?.absoluteString == "https://api.example.com/api/v1/config")
+}

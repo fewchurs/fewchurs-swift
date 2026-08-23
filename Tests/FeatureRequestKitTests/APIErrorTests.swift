@@ -5,7 +5,7 @@ import Testing
 @Test func apiErrorMapsKnownBackendCodes() {
     #expect(APIError.from(code: "invalid_key", message: "bad key") == .invalidKey)
     #expect(APIError.from(code: "missing_device_id", message: "no device") == .missingDeviceId)
-    #expect(APIError.from(code: "rate_limited", message: "slow down") == .rateLimited)
+    #expect(APIError.from(code: "rate_limited", message: "slow down") == .rateLimited("slow down"))
     #expect(APIError.from(code: "not_found", message: "gone") == .notFound)
 }
 
@@ -26,7 +26,12 @@ import Testing
     """
     let data = Data(json.utf8)
     let mapped = APIClient.mapError(data: data, statusCode: 429)
-    #expect(mapped == .rateLimited)
+    #expect(mapped == .rateLimited("Too many requests"))
+}
+
+@Test func apiErrorRateLimitedFallsBackWhenMessageIsEmpty() {
+    let error = APIError.rateLimited("")
+    #expect(error.userMessage == "You're doing that too fast. Please wait a moment and try again.")
 }
 
 @Test func apiErrorFallsBackWhenBodyIsUnparseable() {

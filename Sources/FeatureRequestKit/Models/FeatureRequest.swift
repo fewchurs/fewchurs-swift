@@ -7,25 +7,44 @@ struct FeatureRequest: Identifiable, Decodable, Equatable, Sendable {
     var status: FeatureStatus
     var upvoteCount: Int
     var hasVoted: Bool
+    var commentCount: Int
+    var followerCount: Int
+    var isFollowing: Bool
     let createdAt: Date
 
     private enum CodingKeys: String, CodingKey {
-        case id, title, description, status, upvoteCount, hasVoted, createdAt
+        case id, title, description, status, upvoteCount, hasVoted
+        case commentCount, followerCount, isFollowing, createdAt
     }
 
-    init(id: String, title: String, description: String?, status: FeatureStatus, upvoteCount: Int, hasVoted: Bool, createdAt: Date) {
+    init(
+        id: String,
+        title: String,
+        description: String?,
+        status: FeatureStatus,
+        upvoteCount: Int,
+        hasVoted: Bool,
+        commentCount: Int,
+        followerCount: Int,
+        isFollowing: Bool,
+        createdAt: Date
+    ) {
         self.id = id
         self.title = title
         self.description = description
         self.status = status
         self.upvoteCount = upvoteCount
         self.hasVoted = hasVoted
+        self.commentCount = commentCount
+        self.followerCount = followerCount
+        self.isFollowing = isFollowing
         self.createdAt = createdAt
     }
 
-    /// `upvoteCount` and `hasVoted` default to 0/false when absent, since some backends
-    /// return a partial representation on creation (a brand-new feature has no votes yet).
-    /// Every other field must be present — those can't be safely guessed.
+    /// Vote/follow/comment counts and flags default to 0/false when absent, since some
+    /// backends return a partial representation on creation (a brand-new feature starts
+    /// with no votes, followers, or comments). Every other field must be present — those
+    /// can't be safely guessed.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
@@ -34,6 +53,9 @@ struct FeatureRequest: Identifiable, Decodable, Equatable, Sendable {
         status = try container.decode(FeatureStatus.self, forKey: .status)
         upvoteCount = try container.decodeIfPresent(Int.self, forKey: .upvoteCount) ?? 0
         hasVoted = try container.decodeIfPresent(Bool.self, forKey: .hasVoted) ?? false
+        commentCount = try container.decodeIfPresent(Int.self, forKey: .commentCount) ?? 0
+        followerCount = try container.decodeIfPresent(Int.self, forKey: .followerCount) ?? 0
+        isFollowing = try container.decodeIfPresent(Bool.self, forKey: .isFollowing) ?? false
         createdAt = try container.decode(Date.self, forKey: .createdAt)
     }
 }

@@ -10,6 +10,16 @@ struct VoteResponse: Decodable {
     let hasVoted: Bool
 }
 
+struct FollowResponse: Decodable {
+    let followerCount: Int
+    let isFollowing: Bool
+}
+
+struct CommentsPage: Decodable {
+    let comments: [Comment]
+    let nextCursor: String?
+}
+
 actor APIClient {
     static let shared = APIClient()
 
