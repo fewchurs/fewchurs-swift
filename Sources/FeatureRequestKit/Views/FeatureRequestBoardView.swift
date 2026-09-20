@@ -3,7 +3,6 @@ import SwiftUI
 public struct FeatureRequestBoardView: View {
     @State private var model = FeatureBoardModel()
     @State private var isPresentingSubmit = false
-    @State private var pendingFollowFeature: FeatureRequest?
 
     public init() {}
 
@@ -42,13 +41,6 @@ public struct FeatureRequestBoardView: View {
             .sheet(isPresented: $isPresentingSubmit) {
                 SubmitFeatureView(model: model)
             }
-            .sheet(item: $pendingFollowFeature) { feature in
-                IdentityPromptSheet(kind: .email) { email in
-                    guard let email else { return }
-                    UserIdentity.email = email
-                    Task { await model.toggleFollow(feature, email: email) }
-                }
-            }
             .task {
                 async let loadFeatures: Void = model.load()
                 async let loadConfig: Void = model.loadConfig()
@@ -58,16 +50,6 @@ public struct FeatureRequestBoardView: View {
         .environment(\.featureRequestTheme, configuration.theme)
         .tint(configuration.theme.accent)
         .preferredColorScheme(configuration.theme.forcesDarkAppearance ? .dark : nil)
-    }
-
-    private func handleFollowTapped(_ feature: FeatureRequest) {
-        if feature.isFollowing {
-            Task { await model.toggleFollow(feature, email: nil) }
-        } else if let email = UserIdentity.email {
-            Task { await model.toggleFollow(feature, email: email) }
-        } else {
-            pendingFollowFeature = feature
-        }
     }
 
     @ViewBuilder
@@ -108,8 +90,6 @@ public struct FeatureRequestBoardView: View {
                     NavigationLink(value: feature.id) {
                         FeatureRowView(feature: feature) {
                             Task { await model.toggleVote(feature) }
-                        } onFollowTapped: {
-                            handleFollowTapped(feature)
                         }
                     }
                     .onAppear {
