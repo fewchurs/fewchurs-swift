@@ -67,7 +67,7 @@ struct FeatureDetailView: View {
             }
 
             HStack(spacing: 12) {
-                if feature.status != .open {
+                if feature.status.showsBadge {
                     StatusBadgeView(status: feature.status)
                 }
                 Spacer()

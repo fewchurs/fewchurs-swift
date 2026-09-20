@@ -16,7 +16,7 @@ struct FeatureRowView: View {
                         .lineLimit(2)
                 }
                 HStack(spacing: 10) {
-                    if feature.status != .open {
+                    if feature.status.showsBadge {
                         StatusBadgeView(status: feature.status)
                     }
                     if feature.commentCount > 0 {
