@@ -82,6 +82,16 @@ private let baseURL = URL(string: "https://api.example.com/api/v1")!
     #expect(json["authorName"] == nil)
 }
 
+/// Guards the 405 regression: the nested `features/{id}/comments` path is GET-only on the
+/// server, so creating a comment must target the flat collection with the id in the body.
+@Test func createCommentPostsToFlatCollectionWithFeatureIdInBody() throws {
+    let endpoint = try Endpoint.createComment(featureId: "feature-42", text: "Nice!", authorName: "Sam")
+    #expect(endpoint.url(relativeTo: baseURL)?.absoluteString == "https://api.example.com/api/v1/comments")
+    let json = try JSONSerialization.jsonObject(with: endpoint.body!) as! [String: Any]
+    #expect(json["featureId"] as? String == "feature-42")
+    #expect(json["authorName"] as? String == "Sam")
+}
+
 @Test func configEndpointUsesGetAndFixedPath() {
     let url = Endpoint.config.url(relativeTo: baseURL)
     #expect(Endpoint.config.method == .get)
