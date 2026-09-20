@@ -3,7 +3,6 @@ import SwiftUI
 struct FeatureRowView: View {
     let feature: FeatureRequest
     let onVote: () -> Void
-    let onFollowTapped: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -29,10 +28,7 @@ struct FeatureRowView: View {
                 }
             }
             Spacer(minLength: 8)
-            HStack(spacing: 8) {
-                FollowButton(isFollowing: feature.isFollowing, action: onFollowTapped)
-                UpvoteButton(count: feature.upvoteCount, hasVoted: feature.hasVoted, action: onVote)
-            }
+            UpvoteButton(count: feature.upvoteCount, hasVoted: feature.hasVoted, action: onVote)
         }
         .padding(.vertical, 4)
     }
