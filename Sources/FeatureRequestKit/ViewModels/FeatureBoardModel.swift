@@ -15,89 +15,120 @@ enum FeatureSort: String, CaseIterable {
 @Observable
 @MainActor
 final class FeatureBoardModel {
-    private(set) var features: [FeatureRequest] = []
-    private(set) var isLoading = false
-    private(set) var isLoadingMore = false
+    /// Everything that is per-tab. Each sort keeps its own page cache so switching tabs can
+    /// render instantly from memory instead of waiting on a round trip.
+    private struct SortState {
+        var features: [FeatureRequest] = []
+        var nextCursor: String?
+        var hasMore = true
+        var loadedAt: Date?
+        var isLoading = false
+        var isLoadingMore = false
+    }
+
     private(set) var boardConfig = BoardConfig.fallback
     var errorMessage: String?
     var errorDetail: String?
     var sort: FeatureSort = .top {
         didSet {
             guard oldValue != sort else { return }
-            Task { await refresh() }
+            // An error left over from the other tab must not cover this tab's cached content.
+            errorMessage = nil
+            errorDetail = nil
+            Task { await loadCurrentSort() }
         }
     }
 
-    private var nextCursor: String?
-    private var hasMore = true
+    private var states: [FeatureSort: SortState] = [:]
     private let apiClient: APIClient
     private let pageLimit = 20
+
+    /// How long a cached tab is served without re-fetching. Long enough that toggling
+    /// back and forth is free, short enough that a tab left open doesn't go stale.
+    private let cacheLifetime: TimeInterval = 30
 
     init(apiClient: APIClient = .shared) {
         self.apiClient = apiClient
     }
 
+    var features: [FeatureRequest] { states[sort]?.features ?? [] }
+    var isLoading: Bool { states[sort]?.isLoading ?? false }
+    var isLoadingMore: Bool { states[sort]?.isLoadingMore ?? false }
+
     func load() async {
-        guard features.isEmpty else { return }
-        await performFreshLoad()
+        await loadCurrentSort()
     }
 
     func refresh() async {
-        await performFreshLoad()
+        await fetchFirstPage(for: sort, showsSpinner: true)
     }
 
     func loadMore() async {
-        guard !isLoadingMore, !isLoading, hasMore, let cursor = nextCursor else { return }
-        isLoadingMore = true
+        let sort = self.sort
+        guard var state = states[sort] else { return }
+        guard !state.isLoadingMore, !state.isLoading, state.hasMore, let cursor = state.nextCursor else { return }
+
+        state.isLoadingMore = true
+        states[sort] = state
         errorMessage = nil
         errorDetail = nil
         do {
             let page: FeaturesPage = try await apiClient.send(.features(sort: sort.rawValue, limit: pageLimit, cursor: cursor))
-            features.append(contentsOf: page.features)
-            nextCursor = page.nextCursor
-            hasMore = page.nextCursor != nil
+            var updated = states[sort] ?? SortState()
+            updated.features.append(contentsOf: page.features)
+            updated.nextCursor = page.nextCursor
+            updated.hasMore = page.nextCursor != nil
+            updated.isLoadingMore = false
+            states[sort] = updated
         } catch {
+            states[sort]?.isLoadingMore = false
             setError(error)
         }
-        isLoadingMore = false
     }
 
     func toggleVote(_ feature: FeatureRequest) async {
-        guard let index = features.firstIndex(where: { $0.id == feature.id }) else { return }
-        let original = features[index]
+        guard let original = self.feature(withId: feature.id) else { return }
         let wasVoted = original.hasVoted
 
-        features[index].hasVoted.toggle()
-        features[index].upvoteCount += wasVoted ? -1 : 1
+        update(featureId: feature.id) {
+            $0.hasVoted.toggle()
+            $0.upvoteCount += wasVoted ? -1 : 1
+        }
 
         do {
             let response: VoteResponse = wasVoted
                 ? try await apiClient.send(.removeVote(featureId: feature.id))
                 : try await apiClient.send(.vote(featureId: feature.id))
-            if let currentIndex = features.firstIndex(where: { $0.id == feature.id }) {
-                features[currentIndex].upvoteCount = response.upvoteCount
-                features[currentIndex].hasVoted = response.hasVoted
+            update(featureId: feature.id) {
+                $0.upvoteCount = response.upvoteCount
+                $0.hasVoted = response.hasVoted
             }
         } catch {
-            if let currentIndex = features.firstIndex(where: { $0.id == feature.id }) {
-                features[currentIndex] = original
-            }
+            update(featureId: feature.id) { $0 = original }
             setError(error)
         }
     }
 
     func feature(withId id: String) -> FeatureRequest? {
-        features.first { $0.id == id }
+        if let match = states[sort]?.features.first(where: { $0.id == id }) {
+            return match
+        }
+        // The detail screen can outlive a tab switch, so fall back to the other tab's cache.
+        for state in states.values {
+            if let match = state.features.first(where: { $0.id == id }) { return match }
+        }
+        return nil
     }
 
     func toggleFollow(_ feature: FeatureRequest, email: String?) async {
-        guard let index = features.firstIndex(where: { $0.id == feature.id }) else { return }
-        let original = features[index]
+        guard let original = self.feature(withId: feature.id) else { return }
         let wasFollowing = original.isFollowing
         guard wasFollowing || email != nil else { return }
 
-        features[index].isFollowing.toggle()
-        features[index].followerCount += wasFollowing ? -1 : 1
+        update(featureId: feature.id) {
+            $0.isFollowing.toggle()
+            $0.followerCount += wasFollowing ? -1 : 1
+        }
 
         do {
             let response: FollowResponse
@@ -106,21 +137,18 @@ final class FeatureBoardModel {
             } else {
                 response = try await apiClient.send(.follow(featureId: feature.id, email: email!))
             }
-            if let currentIndex = features.firstIndex(where: { $0.id == feature.id }) {
-                features[currentIndex].followerCount = response.followerCount
-                features[currentIndex].isFollowing = response.isFollowing
+            update(featureId: feature.id) {
+                $0.followerCount = response.followerCount
+                $0.isFollowing = response.isFollowing
             }
         } catch {
-            if let currentIndex = features.firstIndex(where: { $0.id == feature.id }) {
-                features[currentIndex] = original
-            }
+            update(featureId: feature.id) { $0 = original }
             setError(error)
         }
     }
 
     func incrementCommentCount(for featureId: String) {
-        guard let index = features.firstIndex(where: { $0.id == featureId }) else { return }
-        features[index].commentCount += 1
+        update(featureId: featureId) { $0.commentCount += 1 }
     }
 
     /// Loads once per board open. Never surfaces an error and never overwrites the
@@ -149,22 +177,63 @@ final class FeatureBoardModel {
             created.isFollowing = response.isFollowing
         }
 
-        features.insert(created, at: 0)
+        // Show it immediately on the tab the user is looking at; the other tab's cache is
+        // expired rather than guessed at, since a 0-vote feature's position under "Top"
+        // is the server's call.
+        var state = states[sort] ?? SortState()
+        state.features.insert(created, at: 0)
+        states[sort] = state
+        for other in FeatureSort.allCases where other != sort {
+            states[other]?.loadedAt = nil
+        }
     }
 
-    private func performFreshLoad() async {
-        isLoading = true
+    /// Renders the tab instantly when its cache is warm, and only blocks with a spinner the
+    /// first time a tab is opened. A warm-but-stale tab refreshes silently underneath.
+    private func loadCurrentSort() async {
+        let sort = self.sort
+        guard let state = states[sort], let loadedAt = state.loadedAt else {
+            await fetchFirstPage(for: sort, showsSpinner: true)
+            return
+        }
+        guard Date().timeIntervalSince(loadedAt) > cacheLifetime else { return }
+        await fetchFirstPage(for: sort, showsSpinner: false)
+    }
+
+    private func fetchFirstPage(for sort: FeatureSort, showsSpinner: Bool) async {
+        var state = states[sort] ?? SortState()
+        state.isLoading = showsSpinner
+        states[sort] = state
         errorMessage = nil
         errorDetail = nil
+
         do {
             let page: FeaturesPage = try await apiClient.send(.features(sort: sort.rawValue, limit: pageLimit, cursor: nil))
-            features = page.features
-            nextCursor = page.nextCursor
-            hasMore = page.nextCursor != nil
+            var updated = states[sort] ?? SortState()
+            updated.features = page.features
+            updated.nextCursor = page.nextCursor
+            updated.hasMore = page.nextCursor != nil
+            updated.loadedAt = Date()
+            updated.isLoading = false
+            states[sort] = updated
         } catch {
-            setError(error)
+            states[sort]?.isLoading = false
+            // A failed silent refresh keeps the cached content on screen; surfacing the error
+            // would replace a working list with an error banner for no good reason.
+            if showsSpinner {
+                setError(error)
+            }
         }
-        isLoading = false
+    }
+
+    /// Applies an edit to every cached copy of a feature, so a vote cast on one tab is
+    /// already correct when the user switches to the other.
+    private func update(featureId: String, _ transform: (inout FeatureRequest) -> Void) {
+        for (sort, var state) in states {
+            guard let index = state.features.firstIndex(where: { $0.id == featureId }) else { continue }
+            transform(&state.features[index])
+            states[sort] = state
+        }
     }
 
     private func setError(_ error: Error) {
