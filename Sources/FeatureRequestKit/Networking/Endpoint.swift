@@ -70,13 +70,17 @@ extension Endpoint {
         return Endpoint(path: "features/\(featureId)/comments", method: .get, queryItems: items)
     }
 
+    /// Posts to the flat `/comments` collection, not `features/{id}/comments` — that nested
+    /// path is read-only on the server (GET only), so POSTing to it returns 405. The feature
+    /// is identified by `featureId` in the body instead.
     static func createComment(featureId: String, text: String, authorName: String?) throws -> Endpoint {
         struct Body: Encodable {
+            let featureId: String
             let text: String
             let authorName: String?
         }
-        let data = try JSONEncoder().encode(Body(text: text, authorName: authorName))
-        return Endpoint(path: "features/\(featureId)/comments", method: .post, body: data)
+        let data = try JSONEncoder().encode(Body(featureId: featureId, text: text, authorName: authorName))
+        return Endpoint(path: "comments", method: .post, body: data)
     }
 
     static let config = Endpoint(path: "config", method: .get)
