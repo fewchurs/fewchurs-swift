@@ -23,6 +23,10 @@ final class FeatureDetailModel {
         boardModel.feature(withId: featureId)
     }
 
+    var hidesVoteCounts: Bool {
+        boardModel.boardConfig.hideVoteCounts
+    }
+
     init(featureId: String, boardModel: FeatureBoardModel, apiClient: APIClient = .shared) {
         self.featureId = featureId
         self.boardModel = boardModel

@@ -88,7 +88,7 @@ public struct FeatureRequestBoardView: View {
             List {
                 ForEach(model.features) { feature in
                     NavigationLink(value: feature.id) {
-                        FeatureRowView(feature: feature) {
+                        FeatureRowView(feature: feature, showsVoteCount: !model.boardConfig.hideVoteCounts) {
                             Task { await model.toggleVote(feature) }
                         }
                     }

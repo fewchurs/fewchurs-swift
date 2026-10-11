@@ -74,7 +74,11 @@ struct FeatureDetailView: View {
                 FollowButton(isFollowing: feature.isFollowing) {
                     handleFollowTap(feature: feature)
                 }
-                UpvoteButton(count: feature.upvoteCount, hasVoted: feature.hasVoted) {
+                UpvoteButton(
+                    count: feature.upvoteCount,
+                    hasVoted: feature.hasVoted,
+                    showsCount: !model.hidesVoteCounts
+                ) {
                     Task { await model.toggleVote() }
                 }
             }
