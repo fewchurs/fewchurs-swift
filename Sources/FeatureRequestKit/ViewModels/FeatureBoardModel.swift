@@ -111,7 +111,7 @@ final class FeatureBoardModel {
         errorMessage = nil
         errorDetail = nil
         do {
-            let page: FeaturesPage = try await apiClient.send(.features(sort: sort.apiSort, limit: pageLimit, cursor: cursor, statuses: sort.statuses))
+            let page = try await fetchPage(for: sort, from: cursor)
             var updated = states[sort] ?? SortState()
             updated.features.append(contentsOf: page.features)
             updated.nextCursor = page.nextCursor
@@ -254,7 +254,7 @@ final class FeatureBoardModel {
         errorDetail = nil
 
         do {
-            let page: FeaturesPage = try await apiClient.send(.features(sort: sort.apiSort, limit: pageLimit, cursor: nil, statuses: sort.statuses))
+            let page = try await fetchPage(for: sort, from: nil)
             var updated = states[sort] ?? SortState()
             updated.features = page.features
             updated.nextCursor = page.nextCursor
@@ -269,6 +269,12 @@ final class FeatureBoardModel {
             if showsSpinner {
                 setError(error)
             }
+        }
+    }
+
+    private func fetchPage(for sort: FeatureSort, from cursor: String?) async throws -> FeaturesPage {
+        try await Paging.fetchSkippingEmptyPages(from: cursor) { cursor in
+            try await apiClient.send(.features(sort: sort.apiSort, limit: pageLimit, cursor: cursor, statuses: sort.statuses))
         }
     }
 
