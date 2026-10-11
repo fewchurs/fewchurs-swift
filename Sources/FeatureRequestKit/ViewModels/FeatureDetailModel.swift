@@ -9,6 +9,9 @@ final class FeatureDetailModel {
     private(set) var isLoadingComments = false
     private(set) var isLoadingMoreComments = false
     private(set) var isPostingComment = false
+    private(set) var isLoadingFeature = false
+    /// The server answered 404: the request was deleted, or the id was never valid.
+    private(set) var featureIsMissing = false
     var errorMessage: String?
     var errorDetail: String?
 
@@ -31,6 +34,20 @@ final class FeatureDetailModel {
         self.featureId = featureId
         self.boardModel = boardModel
         self.apiClient = apiClient
+    }
+
+    /// Opening a request that isn't on a loaded page (a deep link, or a page since evicted)
+    /// fetches it instead of showing "not found".
+    func loadFeatureIfNeeded() async {
+        guard feature == nil else { return }
+        await fetchFeature()
+    }
+
+    /// Pull-to-refresh: the request itself (status, counts) and its comments.
+    func refresh() async {
+        async let feature: Void = fetchFeature()
+        async let comments: Void = performFreshLoad()
+        _ = await (feature, comments)
     }
 
     func loadComments() async {
@@ -84,6 +101,22 @@ final class FeatureDetailModel {
         } catch {
             setError(error)
             return false
+        }
+    }
+
+    private func fetchFeature() async {
+        isLoadingFeature = true
+        defer { isLoadingFeature = false }
+        do {
+            let fetched: FeatureRequest = try await apiClient.send(.feature(id: featureId))
+            featureIsMissing = false
+            boardModel.store(fetched)
+        } catch APIError.notFound {
+            featureIsMissing = true
+        } catch {
+            // A failed refresh of a feature already on screen keeps it there; only a feature
+            // we have nothing for needs the error.
+            if feature == nil { setError(error) }
         }
     }
 

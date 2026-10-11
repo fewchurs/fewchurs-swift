@@ -3,6 +3,7 @@ import SwiftUI
 public struct FeatureRequestBoardView: View {
     @State private var model = FeatureBoardModel()
     @State private var isPresentingSubmit = false
+    @State private var path: [String]
 
     private let title: String?
 
@@ -10,6 +11,18 @@ public struct FeatureRequestBoardView: View {
     ///   Fewchurs dashboard, or "Feature Requests" until that loads.
     public init(title: String? = nil) {
         self.title = title
+        _path = State(initialValue: [])
+    }
+
+    /// Opens the board with one request already showing, for deep links and notifications.
+    /// Back goes to the full board.
+    ///
+    /// - Parameters:
+    ///   - featureId: The request's id, as shown in its URL on your public board.
+    ///   - title: The board's navigation title. See `init(title:)`.
+    public init(featureId: String, title: String? = nil) {
+        self.title = title
+        _path = State(initialValue: [featureId])
     }
 
     public var body: some View {
@@ -17,7 +30,7 @@ public struct FeatureRequestBoardView: View {
             fatalError("FeatureRequestBoardView was presented before FeatureRequestKit.configure(apiKey:) was called. Call FeatureRequestKit.configure(apiKey:) once, early in your app's lifecycle, before presenting this view.")
         }
 
-        return NavigationStack {
+        return NavigationStack(path: $path) {
             VStack(spacing: 0) {
                 Picker("Sort", selection: $model.sort) {
                     ForEach(FeatureSort.allCases, id: \.self) { sort in

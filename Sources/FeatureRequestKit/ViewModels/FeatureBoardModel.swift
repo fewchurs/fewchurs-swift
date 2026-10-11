@@ -40,6 +40,9 @@ final class FeatureBoardModel {
     }
 
     private var states: [FeatureSort: SortState] = [:]
+    /// Features loaded one at a time (deep links, detail refresh) that may not be on any
+    /// loaded page. Votes and follows update these copies too.
+    private var standalone: [String: FeatureRequest] = [:]
     private let apiClient: APIClient
     private let pageLimit = 20
 
@@ -124,7 +127,14 @@ final class FeatureBoardModel {
         for state in states.values {
             if let match = state.features.first(where: { $0.id == id }) { return match }
         }
-        return nil
+        return standalone[id]
+    }
+
+    /// Replaces every cached copy with a fresher one from `GET /features/{id}`, and keeps it
+    /// even when it is on no loaded page.
+    func store(_ feature: FeatureRequest) {
+        standalone[feature.id] = feature
+        update(featureId: feature.id) { $0 = feature }
     }
 
     func toggleFollow(_ feature: FeatureRequest, email: String?) async {
@@ -236,6 +246,10 @@ final class FeatureBoardModel {
             guard let index = state.features.firstIndex(where: { $0.id == featureId }) else { continue }
             transform(&state.features[index])
             states[sort] = state
+        }
+        if var feature = standalone[featureId] {
+            transform(&feature)
+            standalone[featureId] = feature
         }
     }
 
