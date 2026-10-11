@@ -69,3 +69,61 @@ private func loadedBoard(_ server: StubServer, features: [String]) async -> Feat
     #expect(model.feature(withId: "f1")?.hasVoted == true)
     #expect(model.errorMessage != nil)
 }
+
+/// The create response from the server: no hasVoted/isFollowing/isMine, followerCount 1
+/// because the server already followed on the user's behalf.
+private let createdFeatureJSON = """
+{"id":"new1","title":"Widgets","description":"","status":"open","upvoteCount":0,\
+"commentCount":0,"followerCount":1,"authorDeviceId":"this-device","authorIsSubscriber":true,\
+"translation":null,"createdAt":"2026-10-01T10:00:00.000Z","updatedAt":"2026-10-01T10:00:00.000Z"}
+"""
+
+@MainActor
+@Test func submitWithEmailIsOneRequestAndMarksTheFeature() async throws {
+    let server = StubServer()
+    let model = await loadedBoard(server, features: [featureJSON(id: "f1")])
+    server.on("POST", "features", .json(201, createdFeatureJSON))
+
+    try await model.submit(title: "Widgets", description: "  ", email: " me@example.com ", isSubscriber: true)
+
+    #expect(server.requests("POST", "features").count == 1)
+    #expect(server.requests.filter { $0.path.hasSuffix("/follow") }.isEmpty)
+    let body = try #require(server.requests("POST", "features").first?.json)
+    #expect(body["email"] as? String == "me@example.com")
+    #expect(body["isSubscriber"] as? Bool == true)
+    #expect(body["description"] == nil)
+
+    let created = try #require(model.feature(withId: "new1"))
+    #expect(model.features.first?.id == "new1")
+    #expect(created.isFollowing == true)
+    #expect(created.followerCount == 1)
+    #expect(created.isMine == true)
+    #expect(created.hasVoted == false)
+}
+
+@MainActor
+@Test func submitWithoutEmailIsNotFollowing() async throws {
+    let server = StubServer()
+    let model = await loadedBoard(server, features: [])
+    server.on("POST", "features", .json(201, createdFeatureJSON.replacingOccurrences(of: #""followerCount":1"#, with: #""followerCount":0"#)))
+
+    try await model.submit(title: "Widgets", description: nil, email: nil)
+
+    let body = try #require(server.requests("POST", "features").first?.json)
+    #expect(body["email"] == nil)
+    #expect(body["isSubscriber"] as? Bool == false)
+    #expect(model.feature(withId: "new1")?.isFollowing == false)
+    #expect(model.feature(withId: "new1")?.isMine == true)
+}
+
+@MainActor
+@Test func submitSurfacesRateLimit() async throws {
+    let server = StubServer()
+    let model = await loadedBoard(server, features: [])
+    server.on("POST", "features", .json(429, #"{"error":{"code":"rate_limited","message":"Daily submission limit reached."}}"#))
+
+    await #expect(throws: APIError.self) {
+        try await model.submit(title: "Widgets", description: nil, email: nil)
+    }
+    #expect(model.features.isEmpty)
+}

@@ -97,3 +97,22 @@ private let baseURL = URL(string: "https://api.example.com/api/v1")!
     #expect(Endpoint.config.method == .get)
     #expect(url?.absoluteString == "https://api.example.com/api/v1/config")
 }
+
+@Test func createFeatureEndpointSendsEmailAndSubscriberFlag() throws {
+    let endpoint = try Endpoint.createFeature(
+        title: "Dark mode",
+        description: nil,
+        email: "me@example.com",
+        isSubscriber: true
+    )
+    let json = try JSONSerialization.jsonObject(with: endpoint.body!) as! [String: Any]
+    #expect(json["email"] as? String == "me@example.com")
+    #expect(json["isSubscriber"] as? Bool == true)
+}
+
+@Test func createFeatureEndpointOmitsEmailWhenNil() throws {
+    let endpoint = try Endpoint.createFeature(title: "Dark mode", description: nil)
+    let json = try JSONSerialization.jsonObject(with: endpoint.body!) as! [String: Any]
+    #expect(json["email"] == nil)
+    #expect(json["isSubscriber"] as? Bool == false)
+}

@@ -163,23 +163,22 @@ final class FeatureBoardModel {
         boardConfig = config
     }
 
-    /// If `email` is provided, the newly created feature is auto-followed via the
-    /// existing follow endpoint — no separate backend contract needed for this.
-    /// A failed auto-follow doesn't fail the submission; the feature was already created.
-    func submit(title: String, description: String?, email: String?) async throws {
+    /// One request: with an `email`, the server follows the new feature itself and returns
+    /// `followerCount` 1. The create response has no per-device flags, so they are set here.
+    func submit(title: String, description: String?, email: String?, isSubscriber: Bool = false) async throws {
         let trimmedDescription = description?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedEmail = email?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let followEmail = (trimmedEmail?.isEmpty ?? true) ? nil : trimmedEmail
         let endpoint = try Endpoint.createFeature(
             title: title,
-            description: (trimmedDescription?.isEmpty ?? true) ? nil : trimmedDescription
+            description: (trimmedDescription?.isEmpty ?? true) ? nil : trimmedDescription,
+            email: followEmail,
+            isSubscriber: isSubscriber
         )
         var created: FeatureRequest = try await apiClient.send(endpoint)
-
-        if let email, !email.isEmpty,
-           let followEndpoint = try? Endpoint.follow(featureId: created.id, email: email),
-           let response: FollowResponse = try? await apiClient.send(followEndpoint) {
-            created.isFollowing = response.following
-            if response.following { created.followerCount = max(created.followerCount, 1) }
-        }
+        created.isFollowing = followEmail != nil
+        created.isMine = true
+        created.hasVoted = false
 
         // Show it immediately on the tab the user is looking at; the other tab's cache is
         // expired rather than guessed at, since a 0-vote feature's position under "Top"
