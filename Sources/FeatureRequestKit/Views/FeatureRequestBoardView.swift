@@ -4,7 +4,13 @@ public struct FeatureRequestBoardView: View {
     @State private var model = FeatureBoardModel()
     @State private var isPresentingSubmit = false
 
-    public init() {}
+    private let title: String?
+
+    /// - Parameter title: The navigation title. Leave it out to use your app's name from the
+    ///   Fewchurs dashboard, or "Feature Requests" until that loads.
+    public init(title: String? = nil) {
+        self.title = title
+    }
 
     public var body: some View {
         guard let configuration = FeatureRequestKit.configuration else {
@@ -24,7 +30,7 @@ public struct FeatureRequestBoardView: View {
                 content(background: configuration.theme.background)
             }
             .background(configuration.theme.background)
-            .navigationTitle("Feature Requests")
+            .navigationTitle(model.navigationTitle(hostTitle: title))
             .navigationDestination(for: String.self) { featureId in
                 FeatureDetailView(featureId: featureId, boardModel: model)
             }
