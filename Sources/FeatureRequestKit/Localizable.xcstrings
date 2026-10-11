@@ -1,0 +1,204 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%lld comments": {
+      "extractionState": "manual"
+    },
+    "%lld of %lld characters": {
+      "extractionState": "manual"
+    },
+    "%lld votes": {
+      "extractionState": "manual"
+    },
+    "1 comment": {
+      "extractionState": "manual"
+    },
+    "1 vote": {
+      "extractionState": "manual"
+    },
+    "Add a comment": {
+      "extractionState": "manual"
+    },
+    "Add a feature request": {
+      "extractionState": "manual"
+    },
+    "App User": {
+      "extractionState": "manual"
+    },
+    "Be the first to suggest an idea.": {
+      "extractionState": "manual"
+    },
+    "Cancel": {
+      "extractionState": "manual"
+    },
+    "Change": {
+      "extractionState": "manual"
+    },
+    "Comments": {
+      "extractionState": "manual"
+    },
+    "Continue": {
+      "extractionState": "manual"
+    },
+    "Couldn't reach the server. Check your connection and try again.": {
+      "extractionState": "manual"
+    },
+    "Declined": {
+      "extractionState": "manual"
+    },
+    "Description (optional)": {
+      "extractionState": "manual"
+    },
+    "Developer": {
+      "extractionState": "manual"
+    },
+    "Display Name": {
+      "extractionState": "manual"
+    },
+    "Done": {
+      "extractionState": "manual"
+    },
+    "Email": {
+      "extractionState": "manual"
+    },
+    "Email (optional)": {
+      "extractionState": "manual"
+    },
+    "Feature Request": {
+      "extractionState": "manual"
+    },
+    "Feature Requests": {
+      "extractionState": "manual"
+    },
+    "FeatureRequestKit has not been configured.": {
+      "extractionState": "manual"
+    },
+    "Follow": {
+      "extractionState": "manual"
+    },
+    "Follow This Request": {
+      "extractionState": "manual"
+    },
+    "Follow request": {
+      "extractionState": "manual"
+    },
+    "Get an email when this request changes.": {
+      "extractionState": "manual"
+    },
+    "In Progress": {
+      "extractionState": "manual"
+    },
+    "Name": {
+      "extractionState": "manual"
+    },
+    "New": {
+      "extractionState": "manual"
+    },
+    "No Feature Requests Yet": {
+      "extractionState": "manual"
+    },
+    "No comments yet.": {
+      "extractionState": "manual"
+    },
+    "Nothing on the Roadmap Yet": {
+      "extractionState": "manual"
+    },
+    "Open": {
+      "extractionState": "manual"
+    },
+    "Planned": {
+      "extractionState": "manual"
+    },
+    "Please check what you entered and try again.": {
+      "extractionState": "manual"
+    },
+    "Post comment": {
+      "extractionState": "manual"
+    },
+    "Powered by Fewchurs": {
+      "extractionState": "manual"
+    },
+    "Received an unexpected response. Please try again later.": {
+      "extractionState": "manual"
+    },
+    "Request Not Found": {
+      "extractionState": "manual"
+    },
+    "Request a Feature": {
+      "extractionState": "manual"
+    },
+    "Requests show up here once they're planned.": {
+      "extractionState": "manual"
+    },
+    "Retry": {
+      "extractionState": "manual"
+    },
+    "Roadmap": {
+      "extractionState": "manual"
+    },
+    "Shown next to your comments. Skip to comment as \"App User\".": {
+      "extractionState": "manual"
+    },
+    "Skip": {
+      "extractionState": "manual"
+    },
+    "Something Went Wrong": {
+      "extractionState": "manual"
+    },
+    "Something went wrong identifying this device. Please try again.": {
+      "extractionState": "manual"
+    },
+    "Something went wrong on our side. Please try again in a moment.": {
+      "extractionState": "manual"
+    },
+    "Sort": {
+      "extractionState": "manual"
+    },
+    "Submit": {
+      "extractionState": "manual"
+    },
+    "That feature request no longer exists.": {
+      "extractionState": "manual"
+    },
+    "This app's API key is invalid. Please contact the developer.": {
+      "extractionState": "manual"
+    },
+    "This board isn't available right now. Please contact the developer.": {
+      "extractionState": "manual"
+    },
+    "This board isn't taking new requests right now. Please try again later.": {
+      "extractionState": "manual"
+    },
+    "Title": {
+      "extractionState": "manual"
+    },
+    "Top": {
+      "extractionState": "manual"
+    },
+    "Upvote": {
+      "extractionState": "manual"
+    },
+    "Want an email when this is added?": {
+      "extractionState": "manual"
+    },
+    "We'll only use this to tell you when this request ships.": {
+      "extractionState": "manual"
+    },
+    "You": {
+      "extractionState": "manual"
+    },
+    "You've reached today's limit for this. Please try again tomorrow.": {
+      "extractionState": "manual"
+    },
+    "Your Name": {
+      "extractionState": "manual"
+    },
+    "Your request": {
+      "extractionState": "manual"
+    },
+    "you@example.com": {
+      "extractionState": "manual"
+    }
+  },
+  "version": "1.0"
+}

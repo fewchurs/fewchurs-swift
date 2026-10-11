@@ -8,12 +8,12 @@ struct LimitCounter: View {
     var body: some View {
         if ValidationLimits.showsCounter(for: text, max: max) {
             let length = ValidationLimits.length(of: text)
-            Text("\(length)/\(max)")
+            Text(verbatim: "\(length)/\(max)")
                 .font(.caption)
                 .monospacedDigit()
                 .foregroundStyle(length > max ? Color.red : Color.secondary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
-                .accessibilityLabel("\(length) of \(max) characters")
+                .accessibilityLabel(String(sdk: "\(length) of \(max) characters"))
         }
     }
 }

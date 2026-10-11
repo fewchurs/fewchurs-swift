@@ -24,11 +24,11 @@ enum FeatureStatus: String, Codable, Sendable, Equatable {
 
     var displayName: String {
         switch self {
-        case .open: return "Open"
-        case .planned: return "Planned"
-        case .inProgress: return "In Progress"
-        case .done: return "Done"
-        case .declined: return "Declined"
+        case .open: return String(sdk: "Open")
+        case .planned: return String(sdk: "Planned")
+        case .inProgress: return String(sdk: "In Progress")
+        case .done: return String(sdk: "Done")
+        case .declined: return String(sdk: "Declined")
         case .unknown: return ""
         }
     }

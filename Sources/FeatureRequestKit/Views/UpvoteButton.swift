@@ -15,7 +15,7 @@ struct UpvoteButton: View {
                 Image(systemName: "chevron.up")
                     .font(.caption.weight(.bold))
                 if showsCount {
-                    Text("\(count)")
+                    Text(count, format: .number)
                         .font(.caption2.weight(.semibold))
                         .monospacedDigit()
                 }
@@ -33,8 +33,8 @@ struct UpvoteButton: View {
         }
         .buttonStyle(.plain)
         // VoiceOver: "Upvote, 42 votes, selected". No count when the owner hid counts.
-        .accessibilityLabel("Upvote")
-        .accessibilityValue(showsCount ? (count == 1 ? "1 vote" : "\(count) votes") : "")
+        .accessibilityLabel(String(sdk: "Upvote"))
+        .accessibilityValue(showsCount ? (count == 1 ? String(sdk: "1 vote") : String(sdk: "\(count) votes")) : "")
         .accessibilityAddTraits(hasVoted ? .isSelected : [])
     }
 }

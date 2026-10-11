@@ -34,14 +34,14 @@ struct FeatureDetailView: View {
                     CommentInputView(text: $commentText, isPosting: model.isPostingComment, onSubmit: submitComment)
                 }
             } else if model.featureIsMissing {
-                ContentUnavailableView("Request Not Found", systemImage: "questionmark.circle")
+                ContentUnavailableView(String(sdk: "Request Not Found"), systemImage: "questionmark.circle")
             } else if let errorMessage = model.errorMessage, !model.isLoadingFeature {
                 ContentUnavailableView {
-                    Label("Something Went Wrong", systemImage: "exclamationmark.triangle")
+                    Label(String(sdk: "Something Went Wrong"), systemImage: "exclamationmark.triangle")
                 } description: {
                     Text(errorMessage)
                 } actions: {
-                    Button("Retry") {
+                    Button(String(sdk: "Retry")) {
                         Task { await model.refresh() }
                     }
                 }
@@ -51,7 +51,7 @@ struct FeatureDetailView: View {
             }
         }
         .background(theme.background)
-        .navigationTitle("Feature Request")
+        .navigationTitle(String(sdk: "Feature Request"))
         .navigationBarTitleDisplayMode(.inline)
         .task {
             async let feature: Void = model.loadFeatureIfNeeded()
@@ -104,7 +104,7 @@ struct FeatureDetailView: View {
             StatusBadgeView(status: feature.status)
         }
         if feature.isMine {
-            MineMarker(text: "Your request")
+            MineMarker(text: String(sdk: "Your request"))
         }
     }
 
@@ -125,7 +125,7 @@ struct FeatureDetailView: View {
     @ViewBuilder
     private var commentsSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Comments")
+            Text(String(sdk: "Comments"))
                 .font(.headline)
                 .padding(.bottom, 4)
 
@@ -134,7 +134,7 @@ struct FeatureDetailView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.top, 24)
             } else if model.comments.isEmpty {
-                Text("No comments yet.")
+                Text(String(sdk: "No comments yet."))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .padding(.top, 4)

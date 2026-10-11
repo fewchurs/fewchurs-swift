@@ -25,7 +25,7 @@ struct CommentInputView: View {
 
     private var inputRow: some View {
         HStack(alignment: .bottom, spacing: 8) {
-            TextField("Add a comment", text: $text, axis: .vertical)
+            TextField(String(sdk: "Add a comment"), text: $text, axis: .vertical)
                 .lineLimit(1...4)
                 .focused($isFocused)
                 .padding(.horizontal, 12)
@@ -48,7 +48,7 @@ struct CommentInputView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(!canSubmit)
-                .accessibilityLabel("Post comment")
+                .accessibilityLabel(String(sdk: "Post comment"))
             }
         }
     }

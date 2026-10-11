@@ -47,27 +47,27 @@ enum APIError: Error, LocalizedError, Equatable {
     var userMessage: String {
         switch self {
         case .invalidKey:
-            return "This app's API key is invalid. Please contact the developer."
+            return String(sdk: "This app's API key is invalid. Please contact the developer.")
         case .missingDeviceId:
-            return "Something went wrong identifying this device. Please try again."
+            return String(sdk: "Something went wrong identifying this device. Please try again.")
         case .validationFailed(let message):
-            return message.isEmpty ? "Please check what you entered and try again." : message
+            return message.isEmpty ? String(sdk: "Please check what you entered and try again.") : message
         case .rateLimited:
-            return "You've reached today's limit for this. Please try again tomorrow."
+            return String(sdk: "You've reached today's limit for this. Please try again tomorrow.")
         case .notFound:
-            return "That feature request no longer exists."
+            return String(sdk: "That feature request no longer exists.")
         case .limitReached:
-            return "This board isn't taking new requests right now. Please try again later."
+            return String(sdk: "This board isn't taking new requests right now. Please try again later.")
         case .unauthorized, .forbidden:
-            return "This board isn't available right now. Please contact the developer."
+            return String(sdk: "This board isn't available right now. Please contact the developer.")
         case .internalError, .server:
-            return "Something went wrong on our side. Please try again in a moment."
+            return String(sdk: "Something went wrong on our side. Please try again in a moment.")
         case .network:
-            return "Couldn't reach the server. Check your connection and try again."
+            return String(sdk: "Couldn't reach the server. Check your connection and try again.")
         case .decoding:
-            return "Received an unexpected response. Please try again later."
+            return String(sdk: "Received an unexpected response. Please try again later.")
         case .notConfigured:
-            return "FeatureRequestKit has not been configured."
+            return String(sdk: "FeatureRequestKit has not been configured.")
         }
     }
 

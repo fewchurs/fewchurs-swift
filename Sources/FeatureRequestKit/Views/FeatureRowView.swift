@@ -31,14 +31,14 @@ struct FeatureRowView: View {
                         StatusBadgeView(status: feature.status)
                     }
                     if feature.isMine {
-                        MineMarker(text: "Your request")
+                        MineMarker(text: String(sdk: "Your request"))
                     }
                     if feature.commentCount > 0 {
-                        Label("\(feature.commentCount)", systemImage: "bubble.left")
+                        Label { Text(feature.commentCount, format: .number) } icon: { Image(systemName: "bubble.left") }
                             .labelStyle(.titleAndIcon)
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                            .accessibilityLabel(feature.commentCount == 1 ? "1 comment" : "\(feature.commentCount) comments")
+                            .accessibilityLabel(feature.commentCount == 1 ? String(sdk: "1 comment") : String(sdk: "\(feature.commentCount) comments"))
                     }
                 }
             }
@@ -97,8 +97,8 @@ struct FollowButton: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Follow request")
-        .accessibilityHint("Get an email when this request changes.")
+        .accessibilityLabel(String(sdk: "Follow request"))
+        .accessibilityHint(String(sdk: "Get an email when this request changes."))
         .accessibilityAddTraits(isFollowing ? .isSelected : [])
     }
 }
