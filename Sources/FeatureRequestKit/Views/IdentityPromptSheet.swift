@@ -9,29 +9,29 @@ struct IdentityPromptSheet: View {
 
         var title: String {
             switch self {
-            case .email: return "Follow This Request"
-            case .displayName: return "Your Name"
+            case .email: return String(sdk: "Follow This Request")
+            case .displayName: return String(sdk: "Your Name")
             }
         }
 
         var fieldLabel: String {
             switch self {
-            case .email: return "Email"
-            case .displayName: return "Display Name"
+            case .email: return String(sdk: "Email")
+            case .displayName: return String(sdk: "Display Name")
             }
         }
 
         var placeholder: String {
             switch self {
             case .email: return "you@example.com"
-            case .displayName: return "Name"
+            case .displayName: return String(sdk: "Name")
             }
         }
 
         var footer: String {
             switch self {
-            case .email: return "We'll only use this to tell you when this request ships."
-            case .displayName: return "Shown next to your comments. Skip to comment as \"App User\"."
+            case .email: return String(sdk: "We'll only use this to tell you when this request ships.")
+            case .displayName: return String(sdk: "Shown next to your comments. Skip to comment as \"App User\".")
             }
         }
 
@@ -45,8 +45,8 @@ struct IdentityPromptSheet: View {
 
         var confirmTitle: String {
             switch self {
-            case .email: return "Follow"
-            case .displayName: return "Continue"
+            case .email: return String(sdk: "Follow")
+            case .displayName: return String(sdk: "Continue")
             }
         }
     }
@@ -92,7 +92,7 @@ struct IdentityPromptSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Skip") {
+                    Button(String(sdk: "Skip")) {
                         onConfirm(nil)
                         dismiss()
                     }

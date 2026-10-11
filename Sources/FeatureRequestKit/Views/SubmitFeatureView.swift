@@ -29,10 +29,10 @@ struct SubmitFeatureView: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Title", text: $title, axis: .vertical)
+                    TextField(String(sdk: "Title"), text: $title, axis: .vertical)
                     LimitCounter(text: title, max: ValidationLimits.titleMax)
                 } header: {
-                    Text("Title")
+                    Text(String(sdk: "Title"))
                 }
 
                 Section {
@@ -40,12 +40,12 @@ struct SubmitFeatureView: View {
                         .frame(minHeight: 100)
                     LimitCounter(text: description, max: ValidationLimits.descriptionMax)
                 } header: {
-                    Text("Description (optional)")
+                    Text(String(sdk: "Description (optional)"))
                 }
 
                 Section {
                     if isEditingEmail {
-                        TextField("you@example.com", text: $email)
+                        TextField(String(sdk: "you@example.com"), text: $email)
                             .keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
@@ -54,14 +54,14 @@ struct SubmitFeatureView: View {
                             Text(email)
                                 .foregroundStyle(.secondary)
                             Spacer()
-                            Button("Change") { isEditingEmail = true }
+                            Button(String(sdk: "Change")) { isEditingEmail = true }
                                 .font(.caption)
                         }
                     }
                 } header: {
-                    Text("Email (optional)")
+                    Text(String(sdk: "Email (optional)"))
                 } footer: {
-                    Text("Want an email when this is added?")
+                    Text(String(sdk: "Want an email when this is added?"))
                 }
 
                 if let errorMessage {
@@ -77,17 +77,17 @@ struct SubmitFeatureView: View {
                     }
                 }
             }
-            .navigationTitle("Request a Feature")
+            .navigationTitle(String(sdk: "Request a Feature"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(String(sdk: "Cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     if isSubmitting {
                         ProgressView()
                     } else {
-                        Button("Submit") { submit() }
+                        Button(String(sdk: "Submit")) { submit() }
                             .disabled(!canSubmit)
                     }
                 }

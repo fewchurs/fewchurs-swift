@@ -8,9 +8,9 @@ enum FeatureSort: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .top: return "Top"
-        case .new: return "New"
-        case .roadmap: return "Roadmap"
+        case .top: return String(sdk: "Top")
+        case .new: return String(sdk: "New")
+        case .roadmap: return String(sdk: "Roadmap")
         }
     }
 
@@ -88,7 +88,7 @@ final class FeatureBoardModel {
     func navigationTitle(hostTitle: String?) -> String {
         if let hostTitle, !hostTitle.isEmpty { return hostTitle }
         if let appName = boardConfig.appName, !appName.isEmpty { return appName }
-        return "Feature Requests"
+        return String(sdk: "Feature Requests")
     }
     var isLoading: Bool { states[sort]?.isLoading ?? false }
     var isLoadingMore: Bool { states[sort]?.isLoadingMore ?? false }

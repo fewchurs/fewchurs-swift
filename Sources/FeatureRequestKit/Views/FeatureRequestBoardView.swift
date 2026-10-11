@@ -39,7 +39,7 @@ public struct FeatureRequestBoardView: View {
 
         return NavigationStack(path: $path) {
             VStack(spacing: 0) {
-                Picker("Sort", selection: $model.sort) {
+                Picker(String(sdk: "Sort"), selection: $model.sort) {
                     ForEach(FeatureSort.visible(showsRoadmap: showsRoadmap), id: \.self) { sort in
                         Text(sort.displayName).tag(sort)
                     }
@@ -61,7 +61,7 @@ public struct FeatureRequestBoardView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .accessibilityLabel("Request a feature")
+                    .accessibilityLabel(String(sdk: "Add a feature request"))
                 }
             }
             .sheet(isPresented: $isPresentingSubmit) {
@@ -85,7 +85,7 @@ public struct FeatureRequestBoardView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let errorMessage = model.errorMessage, model.features.isEmpty {
             ContentUnavailableView {
-                Label("Something Went Wrong", systemImage: "exclamationmark.triangle")
+                Label(String(sdk: "Something Went Wrong"), systemImage: "exclamationmark.triangle")
             } description: {
                 VStack(spacing: 4) {
                     Text(errorMessage)
@@ -96,23 +96,23 @@ public struct FeatureRequestBoardView: View {
                     }
                 }
             } actions: {
-                Button("Retry") {
+                Button(String(sdk: "Retry")) {
                     Task { await model.refresh() }
                 }
             }
         } else if model.features.isEmpty && model.sort == .roadmap {
             ContentUnavailableView {
-                Label("Nothing on the Roadmap Yet", systemImage: "map")
+                Label(String(sdk: "Nothing on the Roadmap Yet"), systemImage: "map")
             } description: {
-                Text("Requests show up here once they're planned.")
+                Text(String(sdk: "Requests show up here once they're planned."))
             }
         } else if model.features.isEmpty {
             ContentUnavailableView {
-                Label("No Feature Requests Yet", systemImage: "lightbulb")
+                Label(String(sdk: "No Feature Requests Yet"), systemImage: "lightbulb")
             } description: {
-                Text("Be the first to suggest an idea.")
+                Text(String(sdk: "Be the first to suggest an idea."))
             } actions: {
-                Button("Request a Feature") {
+                Button(String(sdk: "Request a Feature")) {
                     isPresentingSubmit = true
                 }
             }

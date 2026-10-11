@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "FeatureRequestKit",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v17)
     ],
@@ -16,7 +17,8 @@ let package = Package(
         .target(
             name: "FeatureRequestKit",
             resources: [
-                .copy("PrivacyInfo.xcprivacy")
+                .copy("PrivacyInfo.xcprivacy"),
+                .process("Localizable.xcstrings")
             ],
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
