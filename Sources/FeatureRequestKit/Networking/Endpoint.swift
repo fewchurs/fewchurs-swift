@@ -33,13 +33,22 @@ extension Endpoint {
         return Endpoint(path: "features", method: .get, queryItems: items)
     }
 
-    static func createFeature(title: String, description: String?) throws -> Endpoint {
+    /// With an `email`, the server creates the feature and follows it in the same request, so
+    /// there is no separate `/follow` call. Nil fields are left out of the body.
+    static func createFeature(
+        title: String,
+        description: String?,
+        email: String? = nil,
+        isSubscriber: Bool = false
+    ) throws -> Endpoint {
         struct Body: Encodable {
             let title: String
             let description: String?
+            let email: String?
+            let isSubscriber: Bool
         }
-        let data = try JSONEncoder().encode(Body(title: title, description: description))
-        return Endpoint(path: "features", method: .post, body: data)
+        let body = Body(title: title, description: description, email: email, isSubscriber: isSubscriber)
+        return Endpoint(path: "features", method: .post, body: try JSONEncoder().encode(body))
     }
 
     static func vote(featureId: String) -> Endpoint {
