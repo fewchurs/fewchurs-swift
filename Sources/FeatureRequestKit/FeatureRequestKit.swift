@@ -39,11 +39,22 @@ public enum FeatureRequestKit {
         configuration?.isSubscriber?() ?? false
     }
 
+    /// The signed-in user's email, if the host told us. Kept apart from `configuration` so
+    /// `identify` and `configure` can be called in either order.
+    static var identifiedEmail: String?
+
+    /// Tells the board who is signed in to your app, so they aren't asked for their email.
+    ///
+    /// The email pre-fills the "Email (optional)" field when submitting a request and is used
+    /// to follow a request with one tap. If the user typed a different email into the board
+    /// before, that one wins. Pass `nil` when the user signs out.
+    public static func identify(email: String?) {
+        let trimmed = email?.trimmingCharacters(in: .whitespacesAndNewlines)
+        identifiedEmail = (trimmed?.isEmpty ?? true) ? nil : trimmed
+    }
+
+    @available(*, deprecated, message: "The Fewchurs API has no notion of a user ID: votes and follows belong to the device, so userId was never sent anywhere. Use identify(email:) instead.")
     public static func identify(userId: String, email: String? = nil) {
-        guard configuration != nil else {
-            fatalError("FeatureRequestKit.identify(userId:email:) was called before FeatureRequestKit.configure(apiKey:). Call configure() first.")
-        }
-        configuration?.userId = userId
-        configuration?.email = email
+        identify(email: email)
     }
 }

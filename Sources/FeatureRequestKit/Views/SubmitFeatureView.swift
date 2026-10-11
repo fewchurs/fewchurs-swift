@@ -20,7 +20,7 @@ struct SubmitFeatureView: View {
 
     init(model: FeatureBoardModel) {
         self.model = model
-        let savedEmail = UserIdentity.email ?? ""
+        let savedEmail = UserIdentity.preferredEmail ?? ""
         _email = State(initialValue: savedEmail)
         _isEditingEmail = State(initialValue: savedEmail.isEmpty)
     }
@@ -109,7 +109,9 @@ struct SubmitFeatureView: View {
                     email: trimmedEmail.isEmpty ? nil : trimmedEmail,
                     isSubscriber: FeatureRequestKit.currentUserIsSubscriber
                 )
-                if !trimmedEmail.isEmpty {
+                // Remember an email the user typed. One that came from identify(email:) stays
+                // with the host, so signing out (identify(email: nil)) really forgets it.
+                if !trimmedEmail.isEmpty, trimmedEmail != FeatureRequestKit.identifiedEmail {
                     UserIdentity.email = trimmedEmail
                 }
                 isSubmitting = false

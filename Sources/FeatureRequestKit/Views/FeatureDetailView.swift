@@ -158,7 +158,7 @@ struct FeatureDetailView: View {
     private func handleFollowTap(feature: FeatureRequest) {
         if feature.isFollowing {
             Task { await model.toggleFollow(email: nil) }
-        } else if let email = UserIdentity.email {
+        } else if let email = UserIdentity.preferredEmail {
             Task { await model.toggleFollow(email: email) }
         } else {
             isPresentingEmailPrompt = true
