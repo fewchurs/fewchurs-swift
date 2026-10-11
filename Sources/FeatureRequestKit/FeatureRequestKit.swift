@@ -1,6 +1,10 @@
 import Foundation
 
 public enum FeatureRequestKit {
+    /// This package's version, sent as `X-Fewchurs-Sdk: swift/<version>`. Bump it with every
+    /// release tag.
+    public static let sdkVersion = "1.1.0"
+
     static var configuration: Configuration?
 
     /// Overridable base URL for testing. When set, takes precedence over the `baseURL` passed

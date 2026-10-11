@@ -47,6 +47,8 @@ actor APIClient {
         request.setValue("Bearer \(configuration.apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue(DeviceIdentity.current, forHTTPHeaderField: "X-Device-Id")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("swift/\(FeatureRequestKit.sdkVersion)", forHTTPHeaderField: "X-Fewchurs-Sdk")
+        request.setValue(Self.acceptLanguage, forHTTPHeaderField: "Accept-Language")
 
         let data: Data
         let response: URLResponse
@@ -78,6 +80,12 @@ actor APIClient {
             return .from(code: decoded.error.code, message: decoded.error.message, statusCode: statusCode)
         }
         return .server("HTTP \(statusCode)")
+    }
+
+    /// The user's first preferred language as a BCP 47 tag, e.g. `en-US`. Not used by the
+    /// server yet; sent now so localisation can start without an SDK update.
+    static var acceptLanguage: String {
+        Locale.preferredLanguages.first ?? "en"
     }
 
     static let decoder: JSONDecoder = {
