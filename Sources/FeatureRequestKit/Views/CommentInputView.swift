@@ -9,10 +9,21 @@ struct CommentInputView: View {
     @FocusState private var isFocused: Bool
 
     private var canSubmit: Bool {
-        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isPosting
+        ValidationLimits.length(of: text) > 0
+            && ValidationLimits.fits(text, max: ValidationLimits.commentMax)
+            && !isPosting
     }
 
     var body: some View {
+        VStack(spacing: 4) {
+            inputRow
+            LimitCounter(text: text, max: ValidationLimits.commentMax)
+        }
+        .padding()
+        .background(.bar)
+    }
+
+    private var inputRow: some View {
         HStack(alignment: .bottom, spacing: 8) {
             TextField("Add a comment", text: $text, axis: .vertical)
                 .lineLimit(1...4)
@@ -37,7 +48,5 @@ struct CommentInputView: View {
                 .disabled(!canSubmit)
             }
         }
-        .padding()
-        .background(.bar)
     }
 }
