@@ -25,13 +25,16 @@ actor APIClient {
     static let shared = APIClient()
 
     private let session: URLSession
+    /// Tests pass a fixed configuration so they never touch the global one.
+    private let configurationOverride: Configuration?
 
-    init(session: URLSession = .shared) {
+    init(session: URLSession = .shared, configuration: Configuration? = nil) {
         self.session = session
+        self.configurationOverride = configuration
     }
 
     func send<T: Decodable>(_ endpoint: Endpoint) async throws -> T {
-        guard let configuration = FeatureRequestKit.configuration else {
+        guard let configuration = configurationOverride ?? FeatureRequestKit.configuration else {
             throw APIError.notConfigured
         }
         guard let url = endpoint.url(relativeTo: configuration.baseURL) else {
