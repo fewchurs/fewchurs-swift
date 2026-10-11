@@ -63,7 +63,7 @@ final class FeatureDetailModel {
         guard !isLoadingMoreComments, !isLoadingComments, hasMoreComments, let cursor = nextCursor else { return }
         isLoadingMoreComments = true
         do {
-            let page: CommentsPage = try await apiClient.send(.comments(featureId: featureId, limit: commentsLimit, cursor: cursor))
+            let page = try await fetchCommentsPage(from: cursor)
             comments.append(contentsOf: page.comments)
             nextCursor = page.nextCursor
             hasMoreComments = page.nextCursor != nil
@@ -125,7 +125,7 @@ final class FeatureDetailModel {
         errorMessage = nil
         errorDetail = nil
         do {
-            let page: CommentsPage = try await apiClient.send(.comments(featureId: featureId, limit: commentsLimit, cursor: nil))
+            let page = try await fetchCommentsPage(from: nil)
             comments = page.comments
             nextCursor = page.nextCursor
             hasMoreComments = page.nextCursor != nil
@@ -133,6 +133,12 @@ final class FeatureDetailModel {
             setError(error)
         }
         isLoadingComments = false
+    }
+
+    private func fetchCommentsPage(from cursor: String?) async throws -> CommentsPage {
+        try await Paging.fetchSkippingEmptyPages(from: cursor) { cursor in
+            try await apiClient.send(.comments(featureId: featureId, limit: commentsLimit, cursor: cursor))
+        }
     }
 
     private func setError(_ error: Error) {
