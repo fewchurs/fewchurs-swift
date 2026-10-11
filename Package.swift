@@ -14,7 +14,10 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "FeatureRequestKit"
+            name: "FeatureRequestKit",
+            resources: [
+                .copy("PrivacyInfo.xcprivacy")
+            ]
         ),
         .testTarget(
             name: "FeatureRequestKitTests",
