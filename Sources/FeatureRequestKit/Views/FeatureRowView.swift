@@ -20,6 +20,9 @@ struct FeatureRowView: View {
                     if feature.status.showsBadge {
                         StatusBadgeView(status: feature.status)
                     }
+                    if feature.isMine {
+                        MineMarker(text: "Your request")
+                    }
                     if feature.commentCount > 0 {
                         Label("\(feature.commentCount)", systemImage: "bubble.left")
                             .labelStyle(.titleAndIcon)
@@ -32,6 +35,21 @@ struct FeatureRowView: View {
             UpvoteButton(count: feature.upvoteCount, hasVoted: feature.hasVoted, showsCount: showsVoteCount, action: onVote)
         }
         .padding(.vertical, 4)
+    }
+}
+
+/// A quiet tag for things this device wrote. Deliberately low-contrast: it orients the user,
+/// it isn't a badge to compete with the status.
+struct MineMarker: View {
+    let text: String
+
+    var body: some View {
+        Text(text)
+            .font(.caption2.weight(.medium))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .overlay(Capsule().strokeBorder(Color.secondary.opacity(0.4)))
     }
 }
 
