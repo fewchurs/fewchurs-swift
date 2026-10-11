@@ -137,10 +137,7 @@ final class FeatureBoardModel {
             } else {
                 response = try await apiClient.send(.follow(featureId: feature.id, email: email!))
             }
-            update(featureId: feature.id) {
-                $0.followerCount = response.followerCount
-                $0.isFollowing = response.isFollowing
-            }
+            update(featureId: feature.id) { $0.isFollowing = response.following }
         } catch {
             update(featureId: feature.id) { $0 = original }
             setError(error)
@@ -173,8 +170,8 @@ final class FeatureBoardModel {
         if let email, !email.isEmpty,
            let followEndpoint = try? Endpoint.follow(featureId: created.id, email: email),
            let response: FollowResponse = try? await apiClient.send(followEndpoint) {
-            created.followerCount = response.followerCount
-            created.isFollowing = response.isFollowing
+            created.isFollowing = response.following
+            if response.following { created.followerCount = max(created.followerCount, 1) }
         }
 
         // Show it immediately on the tab the user is looking at; the other tab's cache is

@@ -10,9 +10,10 @@ struct VoteResponse: Decodable {
     let hasVoted: Bool
 }
 
+/// `POST`/`DELETE /features/{id}/follow` return only `{ following }`. There is no count in the
+/// response, so callers keep their optimistic `followerCount`.
 struct FollowResponse: Decodable {
-    let followerCount: Int
-    let isFollowing: Bool
+    let following: Bool
 }
 
 struct CommentsPage: Decodable {
