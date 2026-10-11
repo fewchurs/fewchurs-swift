@@ -11,6 +11,9 @@ struct Endpoint {
     let method: HTTPMethod
     var queryItems: [URLQueryItem] = []
     var body: Data?
+    /// Sending it twice has the same effect as once, so `APIClient` may retry it after a
+    /// transient failure. False for creates: a retry after a lost response would duplicate.
+    var isIdempotent = false
 
     func url(relativeTo baseURL: URL) -> URL? {
         var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
@@ -34,13 +37,13 @@ extension Endpoint {
         if !statuses.isEmpty {
             items.append(URLQueryItem(name: "status", value: statuses.map(\.rawValue).joined(separator: ",")))
         }
-        return Endpoint(path: "features", method: .get, queryItems: items)
+        return Endpoint(path: "features", method: .get, queryItems: items, isIdempotent: true)
     }
 
     /// With an `email`, the server creates the feature and follows it in the same request, so
     /// there is no separate `/follow` call. Nil fields are left out of the body.
     static func feature(id: String) -> Endpoint {
-        Endpoint(path: "features/\(id)", method: .get)
+        Endpoint(path: "features/\(id)", method: .get, isIdempotent: true)
     }
 
     static func createFeature(
@@ -60,11 +63,11 @@ extension Endpoint {
     }
 
     static func vote(featureId: String) -> Endpoint {
-        Endpoint(path: "features/\(featureId)/vote", method: .post)
+        Endpoint(path: "features/\(featureId)/vote", method: .post, isIdempotent: true)
     }
 
     static func removeVote(featureId: String) -> Endpoint {
-        Endpoint(path: "features/\(featureId)/vote", method: .delete)
+        Endpoint(path: "features/\(featureId)/vote", method: .delete, isIdempotent: true)
     }
 
     static func follow(featureId: String, email: String) throws -> Endpoint {
@@ -72,11 +75,11 @@ extension Endpoint {
             let email: String
         }
         let data = try JSONEncoder().encode(Body(email: email))
-        return Endpoint(path: "features/\(featureId)/follow", method: .post, body: data)
+        return Endpoint(path: "features/\(featureId)/follow", method: .post, body: data, isIdempotent: true)
     }
 
     static func unfollow(featureId: String) -> Endpoint {
-        Endpoint(path: "features/\(featureId)/follow", method: .delete)
+        Endpoint(path: "features/\(featureId)/follow", method: .delete, isIdempotent: true)
     }
 
     static func comments(featureId: String, limit: Int, cursor: String?) -> Endpoint {
@@ -84,7 +87,7 @@ extension Endpoint {
         if let cursor {
             items.append(URLQueryItem(name: "cursor", value: cursor))
         }
-        return Endpoint(path: "features/\(featureId)/comments", method: .get, queryItems: items)
+        return Endpoint(path: "features/\(featureId)/comments", method: .get, queryItems: items, isIdempotent: true)
     }
 
     /// Posts to the flat `/comments` collection, not `features/{id}/comments` — that nested
@@ -100,5 +103,5 @@ extension Endpoint {
         return Endpoint(path: "comments", method: .post, body: data)
     }
 
-    static let config = Endpoint(path: "config", method: .get)
+    static let config = Endpoint(path: "config", method: .get, isIdempotent: true)
 }
