@@ -6,11 +6,16 @@ public struct FeatureRequestBoardView: View {
     @State private var path: [String]
 
     private let title: String?
+    private let showsRoadmap: Bool
 
-    /// - Parameter title: The navigation title. Leave it out to use your app's name from the
-    ///   Fewchurs dashboard, or "Feature Requests" until that loads.
-    public init(title: String? = nil) {
+    /// - Parameters:
+    ///   - title: The navigation title. Leave it out to use your app's name from the
+    ///     Fewchurs dashboard, or "Feature Requests" until that loads.
+    ///   - showsRoadmap: Adds a third "Roadmap" tab listing planned, in-progress and done
+    ///     requests, most-voted first. Off by default.
+    public init(title: String? = nil, showsRoadmap: Bool = false) {
         self.title = title
+        self.showsRoadmap = showsRoadmap
         _path = State(initialValue: [])
     }
 
@@ -19,9 +24,11 @@ public struct FeatureRequestBoardView: View {
     ///
     /// - Parameters:
     ///   - featureId: The request's id, as shown in its URL on your public board.
-    ///   - title: The board's navigation title. See `init(title:)`.
-    public init(featureId: String, title: String? = nil) {
+    ///   - title: The board's navigation title. See `init(title:showsRoadmap:)`.
+    ///   - showsRoadmap: See `init(title:showsRoadmap:)`.
+    public init(featureId: String, title: String? = nil, showsRoadmap: Bool = false) {
         self.title = title
+        self.showsRoadmap = showsRoadmap
         _path = State(initialValue: [featureId])
     }
 
@@ -33,7 +40,7 @@ public struct FeatureRequestBoardView: View {
         return NavigationStack(path: $path) {
             VStack(spacing: 0) {
                 Picker("Sort", selection: $model.sort) {
-                    ForEach(FeatureSort.allCases, id: \.self) { sort in
+                    ForEach(FeatureSort.visible(showsRoadmap: showsRoadmap), id: \.self) { sort in
                         Text(sort.displayName).tag(sort)
                     }
                 }
@@ -92,6 +99,12 @@ public struct FeatureRequestBoardView: View {
                 Button("Retry") {
                     Task { await model.refresh() }
                 }
+            }
+        } else if model.features.isEmpty && model.sort == .roadmap {
+            ContentUnavailableView {
+                Label("Nothing on the Roadmap Yet", systemImage: "map")
+            } description: {
+                Text("Requests show up here once they're planned.")
             }
         } else if model.features.isEmpty {
             ContentUnavailableView {

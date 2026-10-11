@@ -22,13 +22,17 @@ struct Endpoint {
 }
 
 extension Endpoint {
-    static func features(sort: String, limit: Int, cursor: String?) -> Endpoint {
+    /// `statuses` narrows the list (the server ignores names it doesn't know); empty means all.
+    static func features(sort: String, limit: Int, cursor: String?, statuses: [FeatureStatus] = []) -> Endpoint {
         var items = [
             URLQueryItem(name: "sort", value: sort),
             URLQueryItem(name: "limit", value: String(limit))
         ]
         if let cursor {
             items.append(URLQueryItem(name: "cursor", value: cursor))
+        }
+        if !statuses.isEmpty {
+            items.append(URLQueryItem(name: "status", value: statuses.map(\.rawValue).joined(separator: ",")))
         }
         return Endpoint(path: "features", method: .get, queryItems: items)
     }

@@ -3,12 +3,40 @@ import Foundation
 enum FeatureSort: String, CaseIterable {
     case top
     case new
+    /// Opt-in: what's planned, in progress and done, most-voted first.
+    case roadmap
 
     var displayName: String {
         switch self {
         case .top: return "Top"
         case .new: return "New"
+        case .roadmap: return "Roadmap"
         }
+    }
+
+    /// The tabs shown, in order. Roadmap only appears when the host asks for it.
+    static func visible(showsRoadmap: Bool) -> [FeatureSort] {
+        showsRoadmap ? [.top, .new, .roadmap] : [.top, .new]
+    }
+
+    /// The `sort` query value. Roadmap is ordered like Top.
+    var apiSort: String {
+        switch self {
+        case .top, .roadmap: return "top"
+        case .new: return "new"
+        }
+    }
+
+    /// The `status` filter; empty means every status.
+    var statuses: [FeatureStatus] {
+        switch self {
+        case .top, .new: return []
+        case .roadmap: return [.planned, .inProgress, .done]
+        }
+    }
+
+    func includes(_ status: FeatureStatus) -> Bool {
+        statuses.isEmpty || statuses.contains(status)
     }
 }
 
@@ -83,7 +111,7 @@ final class FeatureBoardModel {
         errorMessage = nil
         errorDetail = nil
         do {
-            let page: FeaturesPage = try await apiClient.send(.features(sort: sort.rawValue, limit: pageLimit, cursor: cursor))
+            let page: FeaturesPage = try await apiClient.send(.features(sort: sort.apiSort, limit: pageLimit, cursor: cursor, statuses: sort.statuses))
             var updated = states[sort] ?? SortState()
             updated.features.append(contentsOf: page.features)
             updated.nextCursor = page.nextCursor
@@ -190,13 +218,18 @@ final class FeatureBoardModel {
         created.isMine = true
         created.hasVoted = false
 
-        // Show it immediately on the tab the user is looking at; the other tab's cache is
+        // Show it immediately on the tab the user is looking at; the other tabs' caches are
         // expired rather than guessed at, since a 0-vote feature's position under "Top"
-        // is the server's call.
-        var state = states[sort] ?? SortState()
-        state.features.insert(created, at: 0)
-        states[sort] = state
-        for other in FeatureSort.allCases where other != sort {
+        // is the server's call. A new request is "open", so it never belongs on Roadmap.
+        let shownOn = sort.includes(created.status) ? sort : nil
+        if let shownOn {
+            var state = states[shownOn] ?? SortState()
+            state.features.insert(created, at: 0)
+            states[shownOn] = state
+        } else {
+            standalone[created.id] = created
+        }
+        for other in FeatureSort.allCases where other != shownOn {
             states[other]?.loadedAt = nil
         }
     }
@@ -221,7 +254,7 @@ final class FeatureBoardModel {
         errorDetail = nil
 
         do {
-            let page: FeaturesPage = try await apiClient.send(.features(sort: sort.rawValue, limit: pageLimit, cursor: nil))
+            let page: FeaturesPage = try await apiClient.send(.features(sort: sort.apiSort, limit: pageLimit, cursor: nil, statuses: sort.statuses))
             var updated = states[sort] ?? SortState()
             updated.features = page.features
             updated.nextCursor = page.nextCursor
