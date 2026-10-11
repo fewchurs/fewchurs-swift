@@ -1,6 +1,6 @@
 import Foundation
 
-struct Configuration {
+struct Configuration: Sendable {
     var apiKey: String
     var baseURL: URL
     var theme: FeatureRequestTheme

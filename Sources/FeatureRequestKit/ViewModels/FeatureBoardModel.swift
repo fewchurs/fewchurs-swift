@@ -273,8 +273,10 @@ final class FeatureBoardModel {
     }
 
     private func fetchPage(for sort: FeatureSort, from cursor: String?) async throws -> FeaturesPage {
-        try await Paging.fetchSkippingEmptyPages(from: cursor) { cursor in
-            try await apiClient.send(.features(sort: sort.apiSort, limit: pageLimit, cursor: cursor, statuses: sort.statuses))
+        let client = apiClient
+        let limit = pageLimit
+        return try await Paging.fetchSkippingEmptyPages(from: cursor) { cursor in
+            try await client.send(.features(sort: sort.apiSort, limit: limit, cursor: cursor, statuses: sort.statuses))
         }
     }
 
