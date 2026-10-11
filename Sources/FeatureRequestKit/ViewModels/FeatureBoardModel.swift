@@ -52,6 +52,13 @@ final class FeatureBoardModel {
     }
 
     var features: [FeatureRequest] { states[sort]?.features ?? [] }
+
+    /// The host's title wins; otherwise the app name from `/config`; otherwise a generic title.
+    func navigationTitle(hostTitle: String?) -> String {
+        if let hostTitle, !hostTitle.isEmpty { return hostTitle }
+        if let appName = boardConfig.appName, !appName.isEmpty { return appName }
+        return "Feature Requests"
+    }
     var isLoading: Bool { states[sort]?.isLoading ?? false }
     var isLoadingMore: Bool { states[sort]?.isLoadingMore ?? false }
 

@@ -53,3 +53,15 @@ import Testing
     await model.loadConfig()
     #expect(model.boardConfig == .fallback)
 }
+
+@MainActor
+@Test func navigationTitlePrefersHostThenAppNameThenDefault() async {
+    let server = StubServer()
+    server.on("GET", "config", .json(200, #"{"showBranding":true,"hideVoteCounts":false,"appName":"Acme"}"#))
+    let model = FeatureBoardModel(apiClient: server.makeClient())
+    #expect(model.navigationTitle(hostTitle: nil) == "Feature Requests")
+
+    await model.loadConfig()
+    #expect(model.navigationTitle(hostTitle: nil) == "Acme")
+    #expect(model.navigationTitle(hostTitle: "Ideas") == "Ideas")
+}
