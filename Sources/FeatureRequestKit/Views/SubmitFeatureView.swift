@@ -121,7 +121,8 @@ struct SubmitFeatureView: View {
                 try await model.submit(
                     title: trimmedTitle,
                     description: description,
-                    email: trimmedEmail.isEmpty ? nil : trimmedEmail
+                    email: trimmedEmail.isEmpty ? nil : trimmedEmail,
+                    isSubscriber: FeatureRequestKit.currentUserIsSubscriber
                 )
                 if !trimmedEmail.isEmpty {
                     UserIdentity.email = trimmedEmail
