@@ -27,9 +27,14 @@ struct UpvoteButton: View {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(hasVoted ? theme.accent : theme.accent.opacity(0.12))
             }
+            // The pill keeps its size; the tappable area grows to the 44pt minimum around it.
+            .frame(minWidth: 44, minHeight: 44)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(hasVoted ? "Remove upvote" : "Upvote")
-        .accessibilityValue(showsCount ? "\(count) votes" : "")
+        // VoiceOver: "Upvote, 42 votes, selected". No count when the owner hid counts.
+        .accessibilityLabel("Upvote")
+        .accessibilityValue(showsCount ? (count == 1 ? "1 vote" : "\(count) votes") : "")
+        .accessibilityAddTraits(hasVoted ? .isSelected : [])
     }
 }

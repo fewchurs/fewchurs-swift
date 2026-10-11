@@ -84,25 +84,41 @@ struct FeatureDetailView: View {
                     .foregroundStyle(.secondary)
             }
 
-            HStack(spacing: 12) {
-                if feature.status.showsBadge {
-                    StatusBadgeView(status: feature.status)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) {
+                    tags(for: feature)
+                    Spacer()
+                    actions(for: feature)
                 }
-                if feature.isMine {
-                    MineMarker(text: "Your request")
-                }
-                Spacer()
-                FollowButton(isFollowing: feature.isFollowing) {
-                    handleFollowTap(feature: feature)
-                }
-                UpvoteButton(
-                    count: feature.upvoteCount,
-                    hasVoted: feature.hasVoted,
-                    showsCount: !model.hidesVoteCounts
-                ) {
-                    Task { await model.toggleVote() }
+                VStack(alignment: .leading, spacing: 8) {
+                    tags(for: feature)
+                    HStack(spacing: 12) { actions(for: feature) }
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func tags(for feature: FeatureRequest) -> some View {
+        if feature.status.showsBadge {
+            StatusBadgeView(status: feature.status)
+        }
+        if feature.isMine {
+            MineMarker(text: "Your request")
+        }
+    }
+
+    @ViewBuilder
+    private func actions(for feature: FeatureRequest) -> some View {
+        FollowButton(isFollowing: feature.isFollowing) {
+            handleFollowTap(feature: feature)
+        }
+        UpvoteButton(
+            count: feature.upvoteCount,
+            hasVoted: feature.hasVoted,
+            showsCount: !model.hidesVoteCounts
+        ) {
+            Task { await model.toggleVote() }
         }
     }
 

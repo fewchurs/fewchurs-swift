@@ -34,7 +34,7 @@ struct CommentInputView: View {
 
             if isPosting {
                 ProgressView()
-                    .frame(width: 32, height: 32)
+                    .frame(width: 44, height: 44)
             } else {
                 Button {
                     isFocused = false
@@ -43,9 +43,12 @@ struct CommentInputView: View {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.system(size: 30))
                         .foregroundStyle(canSubmit ? theme.accent : Color.secondary.opacity(0.4))
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .disabled(!canSubmit)
+                .accessibilityLabel("Post comment")
             }
         }
     }

@@ -5,8 +5,18 @@ struct FeatureRowView: View {
     var showsVoteCount = true
     let onVote: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// Side by side normally; stacked at accessibility text sizes, where a side-by-side vote
+    /// button would squeeze the title to a few characters per line.
+    private var layout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: 12))
+    }
+
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        layout {
             VStack(alignment: .leading, spacing: 4) {
                 Text(feature.title)
                     .font(.headline)
@@ -16,7 +26,7 @@ struct FeatureRowView: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                 }
-                HStack(spacing: 10) {
+                FlowingRow {
                     if feature.status.showsBadge {
                         StatusBadgeView(status: feature.status)
                     }
@@ -28,13 +38,28 @@ struct FeatureRowView: View {
                             .labelStyle(.titleAndIcon)
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                            .accessibilityLabel(feature.commentCount == 1 ? "1 comment" : "\(feature.commentCount) comments")
                     }
                 }
             }
-            Spacer(minLength: 8)
+            if !dynamicTypeSize.isAccessibilitySize {
+                Spacer(minLength: 8)
+            }
             UpvoteButton(count: feature.upvoteCount, hasVoted: feature.hasVoted, showsCount: showsVoteCount, action: onVote)
         }
         .padding(.vertical, 4)
+    }
+}
+
+/// Small tags in a row that wrap onto a new line when they don't fit, instead of truncating.
+struct FlowingRow<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 10) { content }
+            VStack(alignment: .leading, spacing: 6) { content }
+        }
     }
 }
 
@@ -67,9 +92,13 @@ struct FollowButton: View {
             Image(systemName: isFollowing ? "bell.fill" : "bell")
                 .font(.body)
                 .foregroundStyle(isFollowing ? theme.accent : Color.secondary)
-                .frame(width: 32, height: 32)
+                // 44pt is the minimum comfortable tap target; the icon itself stays small.
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(isFollowing ? "Unfollow this request" : "Follow this request")
+        .accessibilityLabel("Follow request")
+        .accessibilityHint("Get an email when this request changes.")
+        .accessibilityAddTraits(isFollowing ? .isSelected : [])
     }
 }
