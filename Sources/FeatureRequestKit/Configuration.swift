@@ -7,5 +7,7 @@ struct Configuration {
     var userId: String?
     var email: String?
 
-    static let defaultBaseURL = URL(string: "https://fewchurs.vercel.app/api/v1")!
+    /// The canonical production API. `fewchurs.shop` without `www` answers with a redirect, so
+    /// requests go straight to the host that serves them.
+    static let defaultBaseURL = URL(string: "https://www.fewchurs.shop/api/v1")!
 }
