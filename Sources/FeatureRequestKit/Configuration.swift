@@ -6,8 +6,6 @@ struct Configuration {
     var theme: FeatureRequestTheme
     /// Asked at submit time, so a user who subscribes mid-session is reported correctly.
     var isSubscriber: (@Sendable () -> Bool)?
-    var userId: String?
-    var email: String?
 
     /// The canonical production API. `fewchurs.shop` without `www` answers with a redirect, so
     /// requests go straight to the host that serves them.

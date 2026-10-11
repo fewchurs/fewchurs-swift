@@ -13,6 +13,13 @@ enum UserIdentity {
         set { write(newValue, account: emailAccount) }
     }
 
+    /// The email to use for following and as the submit form's default: what the user typed
+    /// into the board before, otherwise what the host passed to `identify(email:)`.
+    static var preferredEmail: String? {
+        if let email, !email.isEmpty { return email }
+        return FeatureRequestKit.identifiedEmail
+    }
+
     static var displayName: String? {
         get { read(account: displayNameAccount) }
         set { write(newValue, account: displayNameAccount) }
