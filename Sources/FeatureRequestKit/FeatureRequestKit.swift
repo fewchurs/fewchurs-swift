@@ -17,16 +17,26 @@ public enum FeatureRequestKit {
     ///   - theme: Colors and corner radius for the board. Defaults to `.system`.
     ///   - baseURL: The API to talk to. Leave it out for production; pass a staging or local
     ///     server (for example `http://localhost:3000/api/v1`) while developing.
+    ///   - isSubscriber: Optional. Return `true` when the current user pays for your app. It is
+    ///     called each time a request is submitted, and the answer is shown to you in the
+    ///     dashboard next to that request so you can weigh paying users' ideas.
     public static func configure(
         apiKey: String,
         theme: FeatureRequestTheme = .system,
-        baseURL: URL = FeatureRequestKit.productionBaseURL
+        baseURL: URL = FeatureRequestKit.productionBaseURL,
+        isSubscriber: (@Sendable () -> Bool)? = nil
     ) {
         configuration = Configuration(
             apiKey: apiKey,
             baseURL: baseURLOverride ?? baseURL,
-            theme: theme
+            theme: theme,
+            isSubscriber: isSubscriber
         )
+    }
+
+    /// What the host's `isSubscriber` closure says right now, or `false` without one.
+    static var currentUserIsSubscriber: Bool {
+        configuration?.isSubscriber?() ?? false
     }
 
     public static func identify(userId: String, email: String? = nil) {

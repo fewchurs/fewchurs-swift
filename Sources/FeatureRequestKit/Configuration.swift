@@ -4,6 +4,8 @@ struct Configuration {
     var apiKey: String
     var baseURL: URL
     var theme: FeatureRequestTheme
+    /// Asked at submit time, so a user who subscribes mid-session is reported correctly.
+    var isSubscriber: (@Sendable () -> Bool)?
     var userId: String?
     var email: String?
 
