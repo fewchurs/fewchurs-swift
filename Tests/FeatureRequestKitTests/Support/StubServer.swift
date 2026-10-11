@@ -59,7 +59,8 @@ final class StubServer: @unchecked Sendable {
         configuration.protocolClasses = [StubURLProtocol.self]
         return APIClient(
             session: URLSession(configuration: configuration),
-            configuration: Configuration(apiKey: apiKey, baseURL: baseURL, theme: .system)
+            configuration: Configuration(apiKey: apiKey, baseURL: baseURL, theme: .system),
+            retryDelay: 0
         )
     }
 
