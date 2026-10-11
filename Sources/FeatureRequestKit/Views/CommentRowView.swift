@@ -16,6 +16,8 @@ struct CommentRowView: View {
                         .padding(.vertical, 2)
                         .foregroundStyle(.white)
                         .background(Color.blue, in: Capsule())
+                } else if comment.isMine {
+                    MineMarker(text: "You")
                 }
 
                 Spacer()

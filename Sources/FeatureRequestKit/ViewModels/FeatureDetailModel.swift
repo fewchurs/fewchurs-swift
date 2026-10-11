@@ -76,7 +76,8 @@ final class FeatureDetailModel {
         defer { isPostingComment = false }
         do {
             let endpoint = try Endpoint.createComment(featureId: featureId, text: trimmed, authorName: authorName)
-            let comment: Comment = try await apiClient.send(endpoint)
+            var comment: Comment = try await apiClient.send(endpoint)
+            comment.isMine = true
             comments.append(comment)
             boardModel.incrementCommentCount(for: featureId)
             return true

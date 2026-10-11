@@ -70,6 +70,9 @@ struct FeatureDetailView: View {
                 if feature.status.showsBadge {
                     StatusBadgeView(status: feature.status)
                 }
+                if feature.isMine {
+                    MineMarker(text: "Your request")
+                }
                 Spacer()
                 FollowButton(isFollowing: feature.isFollowing) {
                     handleFollowTap(feature: feature)

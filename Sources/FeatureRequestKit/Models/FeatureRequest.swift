@@ -10,11 +10,14 @@ struct FeatureRequest: Identifiable, Decodable, Equatable, Sendable {
     var commentCount: Int
     var followerCount: Int
     var isFollowing: Bool
+    /// This device submitted the request. The server works it out, so the SDK never needs
+    /// (and never decodes) `authorDeviceId`, which is another user's device ID.
+    var isMine: Bool
     let createdAt: Date
 
     private enum CodingKeys: String, CodingKey {
         case id, title, description, status, upvoteCount, hasVoted
-        case commentCount, followerCount, isFollowing, createdAt
+        case commentCount, followerCount, isFollowing, isMine, createdAt
     }
 
     init(
@@ -27,6 +30,7 @@ struct FeatureRequest: Identifiable, Decodable, Equatable, Sendable {
         commentCount: Int,
         followerCount: Int,
         isFollowing: Bool,
+        isMine: Bool = false,
         createdAt: Date
     ) {
         self.id = id
@@ -38,6 +42,7 @@ struct FeatureRequest: Identifiable, Decodable, Equatable, Sendable {
         self.commentCount = commentCount
         self.followerCount = followerCount
         self.isFollowing = isFollowing
+        self.isMine = isMine
         self.createdAt = createdAt
     }
 
@@ -56,6 +61,7 @@ struct FeatureRequest: Identifiable, Decodable, Equatable, Sendable {
         commentCount = try container.decodeIfPresent(Int.self, forKey: .commentCount) ?? 0
         followerCount = try container.decodeIfPresent(Int.self, forKey: .followerCount) ?? 0
         isFollowing = try container.decodeIfPresent(Bool.self, forKey: .isFollowing) ?? false
+        isMine = try container.decodeIfPresent(Bool.self, forKey: .isMine) ?? false
         createdAt = try container.decode(Date.self, forKey: .createdAt)
     }
 }
