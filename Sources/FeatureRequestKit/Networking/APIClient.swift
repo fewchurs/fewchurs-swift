@@ -1,22 +1,22 @@
 import Foundation
 
-struct FeaturesPage: Decodable {
+struct FeaturesPage: Decodable, Sendable {
     let features: [FeatureRequest]
     let nextCursor: String?
 }
 
-struct VoteResponse: Decodable {
+struct VoteResponse: Decodable, Sendable {
     let upvoteCount: Int
     let hasVoted: Bool
 }
 
 /// `POST`/`DELETE /features/{id}/follow` return only `{ following }`. There is no count in the
 /// response, so callers keep their optimistic `followerCount`.
-struct FollowResponse: Decodable {
+struct FollowResponse: Decodable, Sendable {
     let following: Bool
 }
 
-struct CommentsPage: Decodable {
+struct CommentsPage: Decodable, Sendable {
     let comments: [Comment]
     let nextCursor: String?
 }
@@ -138,10 +138,10 @@ actor APIClient {
         decoder.dateDecodingStrategy = .custom { valueDecoder in
             let container = try valueDecoder.singleValueContainer()
             let string = try container.decode(String.self)
-            if let date = isoFormatterWithFractionalSeconds.date(from: string) {
+            if let date = try? isoWithFractionalSeconds.parse(string) {
                 return date
             }
-            if let date = isoFormatter.date(from: string) {
+            if let date = try? iso.parse(string) {
                 return date
             }
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid ISO8601 date: \(string)")
@@ -149,15 +149,7 @@ actor APIClient {
         return decoder
     }()
 
-    private static let isoFormatterWithFractionalSeconds: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
-
-    private static let isoFormatter: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter
-    }()
+    /// Format styles are Sendable values, unlike the `ISO8601DateFormatter` class.
+    private static let isoWithFractionalSeconds = Date.ISO8601FormatStyle(includingFractionalSeconds: true)
+    private static let iso = Date.ISO8601FormatStyle()
 }

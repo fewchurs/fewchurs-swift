@@ -17,11 +17,17 @@ let package = Package(
             name: "FeatureRequestKit",
             resources: [
                 .copy("PrivacyInfo.xcprivacy")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
             ]
         ),
         .testTarget(
             name: "FeatureRequestKitTests",
-            dependencies: ["FeatureRequestKit"]
+            dependencies: ["FeatureRequestKit"],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
+            ]
         ),
     ]
 )

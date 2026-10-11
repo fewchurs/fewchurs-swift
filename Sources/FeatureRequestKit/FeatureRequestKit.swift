@@ -5,11 +5,21 @@ public enum FeatureRequestKit {
     /// release tag.
     public static let sdkVersion = "1.1.0"
 
-    static var configuration: Configuration?
+    private static let configurationStorage = Locked<Configuration?>(nil)
+    private static let baseURLOverrideStorage = Locked<URL?>(nil)
+    private static let identifiedEmailStorage = Locked<String?>(nil)
+
+    static var configuration: Configuration? {
+        get { configurationStorage.value }
+        set { configurationStorage.value = newValue }
+    }
 
     /// Overridable base URL for testing. When set, takes precedence over the `baseURL` passed
     /// to `configure`.
-    static var baseURLOverride: URL?
+    static var baseURLOverride: URL? {
+        get { baseURLOverrideStorage.value }
+        set { baseURLOverrideStorage.value = newValue }
+    }
 
     /// The production Fewchurs API. This is what `configure` uses unless you pass a `baseURL`.
     public static let productionBaseURL = Configuration.defaultBaseURL
@@ -45,7 +55,10 @@ public enum FeatureRequestKit {
 
     /// The signed-in user's email, if the host told us. Kept apart from `configuration` so
     /// `identify` and `configure` can be called in either order.
-    static var identifiedEmail: String?
+    static var identifiedEmail: String? {
+        get { identifiedEmailStorage.value }
+        set { identifiedEmailStorage.value = newValue }
+    }
 
     /// Tells the board who is signed in to your app, so they aren't asked for their email.
     ///

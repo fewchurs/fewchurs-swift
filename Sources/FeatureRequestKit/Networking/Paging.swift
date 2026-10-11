@@ -22,9 +22,9 @@ enum Paging {
     /// it has cut the page. Paging is driven by the last row appearing, so an empty page would
     /// stall it for good. This keeps fetching until a page has rows, the cursor runs out, or
     /// the cap is hit.
-    static func fetchSkippingEmptyPages<Page: CursorPage>(
+    static func fetchSkippingEmptyPages<Page: CursorPage & Sendable>(
         from cursor: String?,
-        _ fetch: (String?) async throws -> Page
+        _ fetch: @Sendable (String?) async throws -> Page
     ) async throws -> Page {
         var page = try await fetch(cursor)
         var skipped = 0

@@ -136,8 +136,11 @@ final class FeatureDetailModel {
     }
 
     private func fetchCommentsPage(from cursor: String?) async throws -> CommentsPage {
-        try await Paging.fetchSkippingEmptyPages(from: cursor) { cursor in
-            try await apiClient.send(.comments(featureId: featureId, limit: commentsLimit, cursor: cursor))
+        let client = apiClient
+        let featureId = featureId
+        let limit = commentsLimit
+        return try await Paging.fetchSkippingEmptyPages(from: cursor) { cursor in
+            try await client.send(.comments(featureId: featureId, limit: limit, cursor: cursor))
         }
     }
 
