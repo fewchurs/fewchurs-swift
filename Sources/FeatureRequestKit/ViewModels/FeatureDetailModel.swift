@@ -138,6 +138,6 @@ final class FeatureDetailModel {
     private func setError(_ error: Error) {
         let apiError = (error as? APIError) ?? .network
         errorMessage = apiError.userMessage
-        errorDetail = apiError.debugDetail
+        errorDetail = apiError.presentableDebugDetail
     }
 }

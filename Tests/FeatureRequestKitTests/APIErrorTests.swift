@@ -7,6 +7,10 @@ import Testing
     #expect(APIError.from(code: "missing_device_id", message: "no device") == .missingDeviceId)
     #expect(APIError.from(code: "rate_limited", message: "slow down") == .rateLimited("slow down"))
     #expect(APIError.from(code: "not_found", message: "gone") == .notFound)
+    #expect(APIError.from(code: "limit_reached", message: "Plan limit") == .limitReached("Plan limit"))
+    #expect(APIError.from(code: "unauthorized", message: "no") == .unauthorized)
+    #expect(APIError.from(code: "forbidden", message: "no") == .forbidden)
+    #expect(APIError.from(code: "internal", message: "Failed to create feature.") == .internalError("Failed to create feature."))
 }
 
 @Test func apiErrorPreservesValidationMessage() {
@@ -15,28 +19,44 @@ import Testing
     #expect(error.userMessage == "Title is required")
 }
 
-@Test func apiErrorFallsBackToServerForUnknownCode() {
-    let error = APIError.from(code: "internal", message: "Something broke")
-    #expect(error == .server("Something broke"))
+/// Server text for these codes is for developers. Users get friendly copy instead.
+@Test func serverMessagesNeverBecomeTheUserMessage() {
+    let raw = "Failed to create feature: Firestore DEADLINE_EXCEEDED"
+    for error in [
+        APIError.from(code: "internal", message: raw),
+        APIError.from(code: "limit_reached", message: raw),
+        APIError.from(code: "rate_limited", message: raw),
+        APIError.from(code: "some_future_code", message: raw, statusCode: 418),
+    ] {
+        #expect(!error.userMessage.contains("Firestore"))
+        #expect(error.debugDetail?.contains("Firestore") == true)
+    }
+}
+
+@Test func apiErrorUnknownCodeKeepsCodeAndStatusForDebugging() {
+    let error = APIError.from(code: "teapot", message: "Short and stout", statusCode: 418)
+    #expect(error == .server("teapot (HTTP 418): Short and stout"))
+    #expect(error.userMessage == "Something went wrong on our side. Please try again in a moment.")
 }
 
 @Test func apiErrorMapsHTTPResponseBody() {
     let json = """
     { "error": { "code": "rate_limited", "message": "Too many requests" } }
     """
-    let data = Data(json.utf8)
-    let mapped = APIClient.mapError(data: data, statusCode: 429)
+    let mapped = APIClient.mapError(data: Data(json.utf8), statusCode: 429)
     #expect(mapped == .rateLimited("Too many requests"))
-}
-
-@Test func apiErrorRateLimitedFallsBackWhenMessageIsEmpty() {
-    let error = APIError.rateLimited("")
-    #expect(error.userMessage == "You're doing that too fast. Please wait a moment and try again.")
+    #expect(mapped.userMessage == "You've reached today's limit for this. Please try again tomorrow.")
 }
 
 @Test func apiErrorFallsBackWhenBodyIsUnparseable() {
-    let mapped = APIClient.mapError(data: Data("not json".utf8), statusCode: 500)
-    #expect(mapped == .server("Something went wrong. Please try again. (500)"))
+    let html = APIClient.mapError(data: Data("<html><body>502 Bad Gateway</body></html>".utf8), statusCode: 502)
+    #expect(html == .server("HTTP 502"))
+    #expect(!html.userMessage.contains("502"))
+    #expect(html.debugDetail == "HTTP 502")
+
+    let empty = APIClient.mapError(data: Data(), statusCode: 405)
+    #expect(empty == .server("HTTP 405"))
+    #expect(empty.userMessage == "Something went wrong on our side. Please try again in a moment.")
 }
 
 @Test func decodingErrorDescribesMissingKey() throws {
@@ -68,4 +88,5 @@ import Testing
 @Test func apiErrorOtherCasesHaveNoDebugDetail() {
     #expect(APIError.invalidKey.debugDetail == nil)
     #expect(APIError.network.debugDetail == nil)
+    #expect(APIError.rateLimited("").debugDetail == nil)
 }
