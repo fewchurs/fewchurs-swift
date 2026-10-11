@@ -12,11 +12,10 @@ struct SubmitFeatureView: View {
     @State private var errorMessage: String?
     @State private var errorDetail: String?
 
-    private let titleLimit = 80
-    private let descriptionLimit = 500
-
     private var canSubmit: Bool {
-        title.trimmingCharacters(in: .whitespacesAndNewlines).count >= 3 && !isSubmitting
+        ValidationLimits.isValidTitle(title)
+            && ValidationLimits.fits(description, max: ValidationLimits.descriptionMax)
+            && !isSubmitting
     }
 
     init(model: FeatureBoardModel) {
@@ -30,15 +29,8 @@ struct SubmitFeatureView: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Title", text: $title)
-                        .onChange(of: title) { _, newValue in
-                            if newValue.count > titleLimit {
-                                title = String(newValue.prefix(titleLimit))
-                            }
-                        }
-                    Text("\(title.count)/\(titleLimit)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    TextField("Title", text: $title, axis: .vertical)
+                    LimitCounter(text: title, max: ValidationLimits.titleMax)
                 } header: {
                     Text("Title")
                 }
@@ -46,14 +38,7 @@ struct SubmitFeatureView: View {
                 Section {
                     TextEditor(text: $description)
                         .frame(minHeight: 100)
-                        .onChange(of: description) { _, newValue in
-                            if newValue.count > descriptionLimit {
-                                description = String(newValue.prefix(descriptionLimit))
-                            }
-                        }
-                    Text("\(description.count)/\(descriptionLimit)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    LimitCounter(text: description, max: ValidationLimits.descriptionMax)
                 } header: {
                     Text("Description (optional)")
                 }

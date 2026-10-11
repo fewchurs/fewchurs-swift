@@ -35,6 +35,14 @@ struct IdentityPromptSheet: View {
             }
         }
 
+        /// Display names are capped by the server; emails are validated there instead.
+        var maxLength: Int? {
+            switch self {
+            case .email: return nil
+            case .displayName: return ValidationLimits.authorNameMax
+            }
+        }
+
         var confirmTitle: String {
             switch self {
             case .email: return "Follow"
@@ -48,7 +56,20 @@ struct IdentityPromptSheet: View {
     let onConfirm: (String?) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @State private var text = ""
+    @State private var text: String
+
+    init(kind: Kind, initialText: String = "", onConfirm: @escaping (String?) -> Void) {
+        self.kind = kind
+        self.onConfirm = onConfirm
+        _text = State(initialValue: initialText)
+    }
+
+    private var canConfirm: Bool {
+        let length = ValidationLimits.length(of: text)
+        guard length > 0 else { return false }
+        if let maxLength = kind.maxLength { return length <= maxLength }
+        return true
+    }
 
     var body: some View {
         NavigationStack {
@@ -58,6 +79,9 @@ struct IdentityPromptSheet: View {
                         .textInputAutocapitalization(kind == .email ? .never : .words)
                         .autocorrectionDisabled(kind == .email)
                         .keyboardType(kind == .email ? .emailAddress : .default)
+                    if let maxLength = kind.maxLength {
+                        LimitCounter(text: text, max: maxLength)
+                    }
                 } header: {
                     Text(kind.fieldLabel)
                 } footer: {
@@ -79,7 +103,7 @@ struct IdentityPromptSheet: View {
                         onConfirm(trimmed.isEmpty ? nil : trimmed)
                         dismiss()
                     }
-                    .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(!canConfirm)
                 }
             }
         }
