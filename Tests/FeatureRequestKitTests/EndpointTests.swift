@@ -116,3 +116,13 @@ private let baseURL = URL(string: "https://api.example.com/api/v1")!
     #expect(json["email"] == nil)
     #expect(json["isSubscriber"] as? Bool == false)
 }
+
+@Test func featuresEndpointSendsStatusFilterOnlyWhenGiven() {
+    let all = Endpoint.features(sort: "top", limit: 20, cursor: nil)
+    let allItems = URLComponents(url: all.url(relativeTo: baseURL)!, resolvingAgainstBaseURL: false)?.queryItems ?? []
+    #expect(!allItems.contains { $0.name == "status" })
+
+    let roadmap = Endpoint.features(sort: "top", limit: 20, cursor: nil, statuses: [.planned, .inProgress, .done])
+    let items = URLComponents(url: roadmap.url(relativeTo: baseURL)!, resolvingAgainstBaseURL: false)?.queryItems ?? []
+    #expect(items.first { $0.name == "status" }?.value == "planned,in_progress,done")
+}
