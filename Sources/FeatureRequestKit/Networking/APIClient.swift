@@ -71,11 +71,13 @@ actor APIClient {
         }
     }
 
+    /// Non-JSON bodies (Vercel 502/504 pages, Next.js 405s, empty bodies) never reach the user
+    /// as text: they become `.server` with only the status code, for `debugDetail`.
     static func mapError(data: Data, statusCode: Int) -> APIError {
         if let decoded = try? JSONDecoder().decode(APIErrorResponse.self, from: data) {
-            return .from(code: decoded.error.code, message: decoded.error.message)
+            return .from(code: decoded.error.code, message: decoded.error.message, statusCode: statusCode)
         }
-        return .server("Something went wrong. Please try again. (\(statusCode))")
+        return .server("HTTP \(statusCode)")
     }
 
     static let decoder: JSONDecoder = {

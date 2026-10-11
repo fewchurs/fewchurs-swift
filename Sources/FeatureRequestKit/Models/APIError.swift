@@ -4,8 +4,18 @@ enum APIError: Error, LocalizedError, Equatable {
     case invalidKey
     case missingDeviceId
     case validationFailed(String)
+    /// The server message, kept for `debugDetail`. Users see friendly copy.
     case rateLimited(String)
     case notFound
+    /// `limit_reached` (402): the board's plan limit. The server message is debug-only.
+    case limitReached(String)
+    case unauthorized
+    case forbidden
+    /// `internal` (500). The server message is debug-only.
+    case internalError(String)
+    /// Anything the SDK can't name: an unknown error code, or a body that isn't the API's
+    /// JSON (a Vercel 502/504 page, a Next.js 405, an empty body). The associated value is a
+    /// debug description and is never shown as the user-facing message.
     case server(String)
     case network
     case decoding(String)
@@ -15,9 +25,23 @@ enum APIError: Error, LocalizedError, Equatable {
     /// rather than for end users. `nil` for cases where there's nothing more specific to show.
     var debugDetail: String? {
         switch self {
-        case .decoding(let detail): return detail
-        default: return nil
+        case .decoding(let detail), .server(let detail):
+            return detail
+        case .rateLimited(let message), .limitReached(let message), .internalError(let message):
+            return message.isEmpty ? nil : message
+        default:
+            return nil
         }
+    }
+
+    /// `debugDetail` in the host app's Debug builds, `nil` in Release, so App Store users only
+    /// ever see `userMessage`.
+    var presentableDebugDetail: String? {
+        #if DEBUG
+        return debugDetail
+        #else
+        return nil
+        #endif
     }
 
     var userMessage: String {
@@ -27,15 +51,19 @@ enum APIError: Error, LocalizedError, Equatable {
         case .missingDeviceId:
             return "Something went wrong identifying this device. Please try again."
         case .validationFailed(let message):
-            return message
-        case .rateLimited(let message):
-            return message.isEmpty ? "You're doing that too fast. Please wait a moment and try again." : message
+            return message.isEmpty ? "Please check what you entered and try again." : message
+        case .rateLimited:
+            return "You've reached today's limit for this. Please try again tomorrow."
         case .notFound:
             return "That feature request no longer exists."
-        case .server(let message):
-            return message
+        case .limitReached:
+            return "This board isn't taking new requests right now. Please try again later."
+        case .unauthorized, .forbidden:
+            return "This board isn't available right now. Please contact the developer."
+        case .internalError, .server:
+            return "Something went wrong on our side. Please try again in a moment."
         case .network:
-            return "You appear to be offline. Check your connection and try again."
+            return "Couldn't reach the server. Check your connection and try again."
         case .decoding:
             return "Received an unexpected response. Please try again later."
         case .notConfigured:
@@ -45,14 +73,20 @@ enum APIError: Error, LocalizedError, Equatable {
 
     var errorDescription: String? { userMessage }
 
-    static func from(code: String, message: String) -> APIError {
+    static func from(code: String, message: String, statusCode: Int? = nil) -> APIError {
         switch code {
         case "invalid_key": return .invalidKey
         case "missing_device_id": return .missingDeviceId
         case "validation_failed": return .validationFailed(message)
         case "rate_limited": return .rateLimited(message)
         case "not_found": return .notFound
-        default: return .server(message)
+        case "limit_reached": return .limitReached(message)
+        case "unauthorized": return .unauthorized
+        case "forbidden": return .forbidden
+        case "internal": return .internalError(message)
+        default:
+            let status = statusCode.map { " (HTTP \($0))" } ?? ""
+            return .server("\(code)\(status): \(message)")
         }
     }
 
