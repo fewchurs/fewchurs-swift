@@ -3,6 +3,8 @@ import SwiftUI
 struct UpvoteButton: View {
     let count: Int
     let hasVoted: Bool
+    /// False when the board owner hid vote counts. The button still votes; only the number goes.
+    var showsCount = true
     let action: () -> Void
 
     @Environment(\.featureRequestTheme) private var theme
@@ -12,9 +14,11 @@ struct UpvoteButton: View {
             VStack(spacing: 2) {
                 Image(systemName: "chevron.up")
                     .font(.caption.weight(.bold))
-                Text("\(count)")
-                    .font(.caption2.weight(.semibold))
-                    .monospacedDigit()
+                if showsCount {
+                    Text("\(count)")
+                        .font(.caption2.weight(.semibold))
+                        .monospacedDigit()
+                }
             }
             .frame(minWidth: 40)
             .padding(.vertical, 6)
@@ -26,6 +30,6 @@ struct UpvoteButton: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(hasVoted ? "Remove upvote" : "Upvote")
-        .accessibilityValue("\(count) votes")
+        .accessibilityValue(showsCount ? "\(count) votes" : "")
     }
 }

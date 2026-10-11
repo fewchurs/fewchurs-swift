@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FeatureRowView: View {
     let feature: FeatureRequest
+    var showsVoteCount = true
     let onVote: () -> Void
 
     var body: some View {
@@ -28,7 +29,7 @@ struct FeatureRowView: View {
                 }
             }
             Spacer(minLength: 8)
-            UpvoteButton(count: feature.upvoteCount, hasVoted: feature.hasVoted, action: onVote)
+            UpvoteButton(count: feature.upvoteCount, hasVoted: feature.hasVoted, showsCount: showsVoteCount, action: onVote)
         }
         .padding(.vertical, 4)
     }
