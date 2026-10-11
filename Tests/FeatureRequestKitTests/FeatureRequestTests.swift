@@ -58,3 +58,20 @@ private let decoder: JSONDecoder = APIClient.decoder
         try decoder.decode(FeatureRequest.self, from: Data(json.utf8))
     }
 }
+
+/// `translation` is the owner's dashboard translation, not for end users. Whatever shape it
+/// arrives in, the feature decodes and keeps its original title.
+@Test func featureIgnoresTranslationInAnyShape() throws {
+    let shapes = [
+        #"{"lang":"fr","title":"Mode sombre","description":"S'il vous plaît"}"#,
+        "null",
+        #""unexpected string""#,
+    ]
+    for shape in shapes {
+        let json = featureJSON(id: "f1", title: "Dark mode")
+            .replacingOccurrences(of: #""translation":null"#, with: #""translation":\#(shape)"#)
+        let feature = try decoder.decode(FeatureRequest.self, from: Data(json.utf8))
+        #expect(feature.title == "Dark mode")
+        #expect(!String(describing: feature).contains("Mode sombre"))
+    }
+}
