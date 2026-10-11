@@ -35,6 +35,10 @@ extension Endpoint {
 
     /// With an `email`, the server creates the feature and follows it in the same request, so
     /// there is no separate `/follow` call. Nil fields are left out of the body.
+    static func feature(id: String) -> Endpoint {
+        Endpoint(path: "features/\(id)", method: .get)
+    }
+
     static func createFeature(
         title: String,
         description: String?,

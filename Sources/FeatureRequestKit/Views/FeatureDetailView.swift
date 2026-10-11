@@ -27,18 +27,36 @@ struct FeatureDetailView: View {
                     }
                     .padding()
                 }
+                .refreshable {
+                    await model.refresh()
+                }
                 .safeAreaInset(edge: .bottom) {
                     CommentInputView(text: $commentText, isPosting: model.isPostingComment, onSubmit: submitComment)
                 }
-            } else {
+            } else if model.featureIsMissing {
                 ContentUnavailableView("Request Not Found", systemImage: "questionmark.circle")
+            } else if let errorMessage = model.errorMessage, !model.isLoadingFeature {
+                ContentUnavailableView {
+                    Label("Something Went Wrong", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text(errorMessage)
+                } actions: {
+                    Button("Retry") {
+                        Task { await model.refresh() }
+                    }
+                }
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .background(theme.background)
         .navigationTitle("Feature Request")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await model.loadComments()
+            async let feature: Void = model.loadFeatureIfNeeded()
+            async let comments: Void = model.loadComments()
+            _ = await (feature, comments)
         }
         .sheet(isPresented: $isPresentingNamePrompt) {
             IdentityPromptSheet(kind: .displayName) { name in
