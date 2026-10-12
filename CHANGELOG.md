@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1
+
+### Fixed
+
+- The vote button in board rows is centred vertically against the row's text, instead of sitting
+  at the top of rows that have a description.
+- Requests now send `X-Fewchurs-Sdk: swift/1.1.1`.
+
 ## 1.1.0
 
 The first tagged release. It brings the SDK up to date with the current Fewchurs API. Every
