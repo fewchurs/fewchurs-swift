@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.2
+
+### Changed
+
+- **Fewer server requests.** The board remembers what it loaded, so closing and reopening it
+  within a minute shows the list instantly without asking the server again; after that it
+  still shows instantly and refreshes in the background. Board settings (branding, hidden vote
+  counts, app name) are cached for five minutes, and pull to refresh reloads them.
+- **Smaller pages, loaded earlier.** 15 requests per page (was 20) and 20 comments (was 50),
+  which cuts the database reads behind each page by about a quarter for requests and more than
+  half for comments. The next page starts loading five rows before the end of the list.
+- Requests now send `X-Fewchurs-Sdk: swift/1.1.2`.
+
 ## 1.1.1
 
 ### Fixed
