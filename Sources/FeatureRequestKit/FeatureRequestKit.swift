@@ -3,7 +3,7 @@ import Foundation
 public enum FeatureRequestKit {
     /// This package's version, sent as `X-Fewchurs-Sdk: swift/<version>`. Bump it with every
     /// release tag.
-    public static let sdkVersion = "1.1.0"
+    public static let sdkVersion = "1.1.1"
 
     private static let configurationStorage = Locked<Configuration?>(nil)
     private static let baseURLOverrideStorage = Locked<URL?>(nil)
