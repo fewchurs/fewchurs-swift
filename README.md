@@ -146,13 +146,17 @@ FeatureRequestBoardView(
 
 ## What's controlled from the dashboard
 
-These need no code. The board reads them each time it opens:
+These need no code. The board picks up changes within five minutes, or straight away when the user pulls the list down to refresh:
 
 - **Hide vote counts** (app settings). The vote buttons show no numbers, but voting still works.
 - **"Powered by Fewchurs" line.** It shows on the Free and Starter plans and disappears on Pro.
 - **App name.** Used as the board's default title.
 
 ## Limits
+
+The board loads 15 requests at a time (20 comments on a request) and fetches the next page as
+the user nears the end of the list. Closing and reopening the board within a minute reuses what
+was loaded instead of asking the server again.
 
 Each device can submit 15 requests and post 10 comments a day; the board tells the user kindly
 when they hit either. Votes and follows aren't limited. Titles are 3–100 characters,

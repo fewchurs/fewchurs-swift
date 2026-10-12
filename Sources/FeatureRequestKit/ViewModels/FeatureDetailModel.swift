@@ -17,7 +17,8 @@ final class FeatureDetailModel {
 
     private var nextCursor: String?
     private var hasMoreComments = true
-    private let commentsLimit = 50
+    /// Each comment is a database read on the server; 20 is a screenful or two.
+    static let commentsLimit = 20
 
     private let boardModel: FeatureBoardModel
     private let apiClient: APIClient
@@ -71,6 +72,11 @@ final class FeatureDetailModel {
             setError(error)
         }
         isLoadingMoreComments = false
+    }
+
+    func shouldLoadMoreComments(after commentId: String) -> Bool {
+        guard let index = comments.firstIndex(where: { $0.id == commentId }) else { return false }
+        return index >= comments.count - FeatureBoardModel.prefetchDistance
     }
 
     func toggleVote() async {
@@ -138,7 +144,7 @@ final class FeatureDetailModel {
     private func fetchCommentsPage(from cursor: String?) async throws -> CommentsPage {
         let client = apiClient
         let featureId = featureId
-        let limit = commentsLimit
+        let limit = Self.commentsLimit
         return try await Paging.fetchSkippingEmptyPages(from: cursor) { cursor in
             try await client.send(.comments(featureId: featureId, limit: limit, cursor: cursor))
         }

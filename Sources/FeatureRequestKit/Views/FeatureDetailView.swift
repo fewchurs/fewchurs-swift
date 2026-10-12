@@ -142,7 +142,7 @@ struct FeatureDetailView: View {
                 ForEach(model.comments) { comment in
                     CommentRowView(comment: comment)
                         .onAppear {
-                            if comment.id == model.comments.last?.id {
+                            if model.shouldLoadMoreComments(after: comment.id) {
                                 Task { await model.loadMoreComments() }
                             }
                         }

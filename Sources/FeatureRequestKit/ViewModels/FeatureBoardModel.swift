@@ -72,11 +72,27 @@ final class FeatureBoardModel {
     /// loaded page. Votes and follows update these copies too.
     private var standalone: [String: FeatureRequest] = [:]
     private let apiClient: APIClient
-    private let pageLimit = 20
+    private var configLoadedAt: Date?
+    /// Which API and key the cached pages came from, so a `configure` call with a different
+    /// key or server never shows another board's data.
+    private var cacheOwner: String?
 
-    /// How long a cached tab is served without re-fetching. Long enough that toggling
-    /// back and forth is free, short enough that a tab left open doesn't go stale.
-    private let cacheLifetime: TimeInterval = 30
+    /// Every row costs the server three database reads (the row, plus "did this device vote"
+    /// and "does it follow"), so pages stay small: 15 rows fill about two screens.
+    static let pageLimit = 15
+    /// Start fetching the next page when a row this close to the end appears, so scrolling
+    /// rarely reaches the spinner even though pages are small.
+    static let prefetchDistance = 5
+
+    /// How long a cached tab is served without re-fetching. After that it is still shown
+    /// instantly and refreshed underneath.
+    static let cacheLifetime: TimeInterval = 60
+    /// `/config` (branding, hidden counts, app name) changes rarely; pull to refresh reloads it.
+    static let configLifetime: TimeInterval = 5 * 60
+
+    /// The board view's model. One instance for the whole app, so closing and reopening the
+    /// board shows what was already loaded instead of paying for the same pages again.
+    static let shared = FeatureBoardModel()
 
     init(apiClient: APIClient = .shared) {
         self.apiClient = apiClient
@@ -94,7 +110,16 @@ final class FeatureBoardModel {
     var isLoadingMore: Bool { states[sort]?.isLoadingMore ?? false }
 
     func load() async {
+        resetCacheIfConfigurationChanged()
         await loadCurrentSort()
+    }
+
+    /// True when `featureId` is near enough to the end of the current tab that the next page
+    /// should start loading.
+    func shouldLoadMore(after featureId: String) -> Bool {
+        let features = self.features
+        guard let index = features.firstIndex(where: { $0.id == featureId }) else { return false }
+        return index >= features.count - Self.prefetchDistance
     }
 
     func refresh() async {
@@ -193,12 +218,27 @@ final class FeatureBoardModel {
         update(featureId: featureId) { $0.commentCount += 1 }
     }
 
-    /// Loads once per board open. Never surfaces an error and never overwrites the
-    /// safe `.fallback` default on failure — a broken config call must not hide the
-    /// board or make branding disappear.
-    func loadConfig() async {
+    /// At most once per `configLifetime` unless `force`d. Never surfaces an error and never
+    /// overwrites the safe `.fallback` default on failure — a broken config call must not hide
+    /// the board or make branding disappear.
+    func loadConfig(force: Bool = false) async {
+        resetCacheIfConfigurationChanged()
+        if !force, let configLoadedAt, Date().timeIntervalSince(configLoadedAt) < Self.configLifetime {
+            return
+        }
         guard let config: BoardConfig = try? await apiClient.send(.config) else { return }
         boardConfig = config
+        configLoadedAt = Date()
+    }
+
+    private func resetCacheIfConfigurationChanged() {
+        let owner = FeatureRequestKit.configuration.map { "\($0.baseURL.absoluteString)|\($0.apiKey)" }
+        guard owner != cacheOwner else { return }
+        cacheOwner = owner
+        states = [:]
+        standalone = [:]
+        boardConfig = .fallback
+        configLoadedAt = nil
     }
 
     /// One request: with an `email`, the server follows the new feature itself and returns
@@ -242,7 +282,7 @@ final class FeatureBoardModel {
             await fetchFirstPage(for: sort, showsSpinner: true)
             return
         }
-        guard Date().timeIntervalSince(loadedAt) > cacheLifetime else { return }
+        guard Date().timeIntervalSince(loadedAt) > Self.cacheLifetime else { return }
         await fetchFirstPage(for: sort, showsSpinner: false)
     }
 
@@ -274,7 +314,7 @@ final class FeatureBoardModel {
 
     private func fetchPage(for sort: FeatureSort, from cursor: String?) async throws -> FeaturesPage {
         let client = apiClient
-        let limit = pageLimit
+        let limit = Self.pageLimit
         return try await Paging.fetchSkippingEmptyPages(from: cursor) { cursor in
             try await client.send(.features(sort: sort.apiSort, limit: limit, cursor: cursor, statuses: sort.statuses))
         }
