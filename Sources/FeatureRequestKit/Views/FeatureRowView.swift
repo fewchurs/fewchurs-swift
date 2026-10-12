@@ -7,12 +7,13 @@ struct FeatureRowView: View {
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    /// Side by side normally; stacked at accessibility text sizes, where a side-by-side vote
-    /// button would squeeze the title to a few characters per line.
+    /// Side by side normally, with the vote button centred against the text however many lines
+    /// it takes; stacked at accessibility text sizes, where a side-by-side vote button would
+    /// squeeze the title to a few characters per line.
     private var layout: AnyLayout {
         dynamicTypeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
-            : AnyLayout(HStackLayout(alignment: .top, spacing: 12))
+            : AnyLayout(HStackLayout(alignment: .center, spacing: 12))
     }
 
     var body: some View {
