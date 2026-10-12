@@ -144,7 +144,7 @@ says **No Feature Requests Yet**. That's normal.
 | Open a request and tap the **bell** | The first time, it asks for your email. Then the bell fills in. Tap again to unfollow |
 | Open a request and write a comment | It asks for a name once (you can skip), then your comment appears with a **You** tag |
 | Pull the list down | It refreshes |
-| In your Fewchurs dashboard, open your app's **Settings**, turn on **Hide vote counts**, then close and reopen the board | The ▲ boxes show no numbers, but voting still works |
+| In your Fewchurs dashboard, open your app's **Settings**, turn on **Hide vote counts**, then pull the board's list down to refresh it | The ▲ boxes show no numbers, but voting still works |
 
 **Optional extras.** Each is a small change to the code from Step 4.
 

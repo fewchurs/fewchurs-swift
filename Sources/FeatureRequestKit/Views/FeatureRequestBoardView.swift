@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct FeatureRequestBoardView: View {
-    @State private var model = FeatureBoardModel()
+    @State private var model = FeatureBoardModel.shared
     @State private var isPresentingSubmit = false
     @State private var path: [String]
 
@@ -68,6 +68,10 @@ public struct FeatureRequestBoardView: View {
                 SubmitFeatureView(model: model)
             }
             .task {
+                // The shared model may remember a Roadmap tab from a board that showed one.
+                if !showsRoadmap && model.sort == .roadmap {
+                    model.sort = .top
+                }
                 async let loadFeatures: Void = model.load()
                 async let loadConfig: Void = model.loadConfig()
                 _ = await (loadFeatures, loadConfig)
@@ -125,7 +129,7 @@ public struct FeatureRequestBoardView: View {
                         }
                     }
                     .onAppear {
-                        if feature.id == model.features.last?.id {
+                        if model.shouldLoadMore(after: feature.id) {
                             Task { await model.loadMore() }
                         }
                     }
@@ -151,7 +155,9 @@ public struct FeatureRequestBoardView: View {
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .refreshable {
-                await model.refresh()
+                async let features: Void = model.refresh()
+                async let config: Void = model.loadConfig(force: true)
+                _ = await (features, config)
             }
         }
     }
