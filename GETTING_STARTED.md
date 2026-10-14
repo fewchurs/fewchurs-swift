@@ -199,7 +199,7 @@ Xcode shows these in red, next to the code or in the list on the left (⌘5).
 | **This app's API key is invalid. Please contact the developer.** | The key in `configure` is wrong, still the placeholder, or turned off. | Copy the key again from your dashboard (Step 1) and paste it exactly, keeping the quotes. |
 | **Couldn't reach the server. Check your connection and try again.** | The phone or simulator is offline, or the server took too long to answer. | Check your Mac's internet connection and tap **Retry**. |
 | **You've reached today's limit for this. Please try again tomorrow.** | Each device can submit 15 requests and 10 comments a day. | Wait until tomorrow. On a simulator you can start fresh with **Device → Erase All Content and Settings…** (this deletes everything on that simulator). |
-| **This board isn't taking new requests right now.** | Your account's plan limit was reached. | Check your plan in the Fewchurs dashboard. |
+| **This board isn't taking new requests right now.** | The server turned the request away because of the account. Plans don't block new requests, so this should be rare. | Check your account in the Fewchurs dashboard, or contact Fewchurs support. |
 | **Something went wrong on our side. Please try again in a moment.** | The Fewchurs server had a problem. | Wait a minute and tap **Retry**. If it keeps happening, contact Fewchurs support. |
 | **Received an unexpected response. Please try again later.** | The app and the server disagree about something. | Make sure you're on the latest package version: **File → Packages → Update to Latest Package Versions**. |
 | **Request Not Found** | That request was deleted. | Nothing to fix. Go back to the list. |
@@ -213,7 +213,10 @@ the App Store never see it.
 
 - **Votes belong to the device, not a person.** Your simulator and your own iPhone count as two
   different voters. That's expected.
-- The **"Powered by Fewchurs"** line at the bottom shows on the Free and Starter plans. It
-  disappears by itself on Pro. You don't need to change any code.
+- The **"Powered by Fewchurs"** line at the bottom shows on the Free plan. It disappears by
+  itself on Starter and Pro. You don't need to change any code.
+- **Your plan sets how many requests the board lists:** an app's first 5 on Free, its first 200
+  on Starter, and all of them on Pro. If your test app already has more than 5 on Free, a
+  request you submit is saved and shows in your dashboard, but it won't stay in the board's list.
 - Your feature requests, votes and comments are real. Anything you create while testing shows
   up in your dashboard, and you can delete it there.

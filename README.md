@@ -149,7 +149,12 @@ FeatureRequestBoardView(
 These need no code. The board picks up changes within five minutes, or straight away when the user pulls the list down to refresh:
 
 - **Hide vote counts** (app settings). The vote buttons show no numbers, but voting still works.
-- **"Powered by Fewchurs" line.** It shows on the Free and Starter plans and disappears on Pro.
+- **"Powered by Fewchurs" line.** It shows on the Free plan and disappears on Starter and Pro.
+- **How many requests the board lists.** The board shows an app's first 5 requests on Free,
+  its first 200 on Starter, and all of them on Pro. Newer requests are still saved and appear
+  in your dashboard. One a user just submitted shows on their board straight away, but once the
+  app is over its limit it leaves the list on the next refresh. They can still open it with
+  `FeatureRequestBoardView(featureId:)`.
 - **App name.** Used as the board's default title.
 
 ## Limits
