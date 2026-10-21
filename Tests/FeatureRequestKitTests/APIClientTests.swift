@@ -3,7 +3,7 @@ import Testing
 @testable import FeatureRequestKit
 
 @Test func sdkVersionIsSemver() {
-    #expect(FeatureRequestKit.sdkVersion == "1.1.2")
+    #expect(FeatureRequestKit.sdkVersion == "1.1.3")
     let parts = FeatureRequestKit.sdkVersion.split(separator: ".")
     #expect(parts.count == 3 && parts.allSatisfy { Int($0) != nil })
 }
