@@ -10,13 +10,13 @@ It takes about 15 minutes.
 ## What you need
 
 - A Mac with **Xcode** installed (free from the Mac App Store). Xcode 15 or newer.
-- A **Fewchurs account** at [fewchurs.shop](https://www.fewchurs.shop) with an app added to it.
+- A **Fewchurs account** at [fewchurs.com](https://www.fewchurs.com) with an app added to it.
 
 ---
 
 ## Step 1: Copy your API key
 
-1. Sign in at [fewchurs.shop](https://www.fewchurs.shop).
+1. Sign in at [fewchurs.com](https://www.fewchurs.com).
 2. Open your app in the dashboard and copy its **API key**. It starts with `fr_live_`.
 3. Keep it somewhere handy. You'll paste it in Step 4.
 

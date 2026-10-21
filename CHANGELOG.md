@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- The default API is now `https://www.fewchurs.com/api/v1`. The board's own domain moved from
+  `fewchurs.shop` to `fewchurs.com`; as before, the apex redirects to `www`, so requests go
+  straight to the host that serves them.
+
 ## 1.1.2
 
 ### Changed

@@ -1,6 +1,6 @@
 # FeatureRequestKit
 
-The SwiftUI SDK for [Fewchurs](https://www.fewchurs.shop): a drop-in feature request board for
+The SwiftUI SDK for [Fewchurs](https://www.fewchurs.com): a drop-in feature request board for
 iOS apps. Your users see what's planned, vote on ideas, follow them, comment, and submit their own.
 
 - iOS 17+, Swift 5.9+ (Xcode 15+)
@@ -109,7 +109,7 @@ that request in your dashboard. Use it to weigh ideas from paying users. Without
 
 ### Base URL
 
-Defaults to production, `https://www.fewchurs.shop/api/v1`. Pass a different `baseURL` to point
+Defaults to production, `https://www.fewchurs.com/api/v1`. Pass a different `baseURL` to point
 the board at a staging or local server, for example `URL(string: "http://localhost:3000/api/v1")!`.
 A plain-HTTP local server also needs `NSAllowsLocalNetworking` in your app's Info.plist.
 
