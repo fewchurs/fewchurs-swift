@@ -1,7 +1,7 @@
 import Foundation
 
 enum APIError: Error, LocalizedError, Equatable {
-    case invalidKey
+    case invalidKey(String)
     case missingDeviceId
     case validationFailed(String)
     /// The server message, kept for `debugDetail`. Users see friendly copy.
@@ -27,7 +27,7 @@ enum APIError: Error, LocalizedError, Equatable {
         switch self {
         case .decoding(let detail), .server(let detail):
             return detail
-        case .rateLimited(let message), .limitReached(let message), .internalError(let message):
+        case .invalidKey(let message), .rateLimited(let message), .limitReached(let message), .internalError(let message):
             return message.isEmpty ? nil : message
         default:
             return nil
@@ -75,7 +75,7 @@ enum APIError: Error, LocalizedError, Equatable {
 
     static func from(code: String, message: String, statusCode: Int? = nil) -> APIError {
         switch code {
-        case "invalid_key": return .invalidKey
+        case "invalid_key", "wrong_app": return .invalidKey(message)
         case "missing_device_id": return .missingDeviceId
         case "validation_failed": return .validationFailed(message)
         case "rate_limited": return .rateLimited(message)

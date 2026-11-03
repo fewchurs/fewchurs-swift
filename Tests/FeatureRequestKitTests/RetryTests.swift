@@ -40,7 +40,7 @@ private let configJSON = #"{"showBranding":true,"hideVoteCounts":false,"appName"
     let server = StubServer()
     server.on("GET", "config", .json(401, #"{"error":{"code":"invalid_key","message":"Invalid or inactive API key."}}"#))
 
-    await #expect(throws: APIError.invalidKey) {
+    await #expect(throws: APIError.invalidKey("Invalid or inactive API key.")) {
         let _: BoardConfig = try await server.makeClient().send(.config)
     }
     #expect(server.requests("GET", "config").count == 1)
