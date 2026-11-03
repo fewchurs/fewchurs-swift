@@ -72,6 +72,7 @@ actor APIClient {
         request.setValue(DeviceIdentity.current, forHTTPHeaderField: "X-Device-Id")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("swift/\(FeatureRequestKit.sdkVersion)", forHTTPHeaderField: "X-Fewchurs-Sdk")
+        request.setValue(Self.appId, forHTTPHeaderField: "X-Fewchurs-App-Id")
         request.setValue(Self.acceptLanguage, forHTTPHeaderField: "Accept-Language")
 
         let (data, httpResponse) = try await perform(request, retrying: endpoint.isIdempotent)
@@ -131,6 +132,10 @@ actor APIClient {
     /// server yet; sent now so localisation can start without an SDK update.
     static var acceptLanguage: String {
         Locale.preferredLanguages.first ?? "en"
+    }
+
+    static var appId: String? {
+        Bundle.main.bundleIdentifier
     }
 
     static let decoder: JSONDecoder = {

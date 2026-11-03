@@ -3,7 +3,7 @@ import Testing
 @testable import FeatureRequestKit
 
 @Test func apiErrorMapsKnownBackendCodes() {
-    #expect(APIError.from(code: "invalid_key", message: "bad key") == .invalidKey)
+    #expect(APIError.from(code: "invalid_key", message: "bad key") == .invalidKey("bad key"))
     #expect(APIError.from(code: "missing_device_id", message: "no device") == .missingDeviceId)
     #expect(APIError.from(code: "rate_limited", message: "slow down") == .rateLimited("slow down"))
     #expect(APIError.from(code: "not_found", message: "gone") == .notFound)
@@ -86,7 +86,7 @@ import Testing
 }
 
 @Test func apiErrorOtherCasesHaveNoDebugDetail() {
-    #expect(APIError.invalidKey.debugDetail == nil)
+    #expect(APIError.invalidKey("").debugDetail == nil)
     #expect(APIError.network.debugDetail == nil)
     #expect(APIError.rateLimited("").debugDetail == nil)
 }

@@ -52,6 +52,10 @@ struct MyApp: App {
 }
 ```
 
+Add your app's Bundle ID to your app in the Fewchurs dashboard. The API key only works there.
+The SDK sends it for you from `Bundle.main.bundleIdentifier`, and IDs under it, such as
+`com.company.app.widget`, are allowed too.
+
 Then show the board anywhere: a sheet, a tab, or a navigation push.
 
 ```swift
@@ -187,6 +191,10 @@ against your own app's practices before submitting.
 The key you pass to `configure(apiKey:)` is a **publishable key**. It identifies your Fewchurs
 app, not a user or an admin, so it's safe to ship inside your app. It can only do what the board
 does (list, vote, follow, comment, submit), not read private data or change settings.
+
+Once your app has a Bundle ID saved in the dashboard, the key only works from that app. A call
+from any other Bundle ID gets `403 wrong_app`, which shows the same "API key is invalid"
+message, with the server's explanation in the grey Debug line.
 
 ## Errors
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2.0
+
+### Added
+
+- Sends the app ID so your API key only works in your own apps. Handles `wrong_app`.
+  Every request carries `X-Fewchurs-App-Id` with your app's Bundle ID. A `403 wrong_app`
+  shows as the invalid API key error, keeps the server's message for Debug builds, and is
+  never retried.
+
+### Changed
+
+- Requests now send `X-Fewchurs-Sdk: swift/1.2.0`.
+
 ## 1.1.3
 
 ### Changed

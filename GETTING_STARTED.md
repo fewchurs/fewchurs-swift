@@ -43,6 +43,10 @@ It takes about 15 minutes.
 3. Open the **General** tab and find **Minimum Deployments**.
 4. If it says something lower than **17.0**, change it to **17.0**.
 
+**Add your Bundle ID to the dashboard.** On the same **General** tab, copy the **Bundle
+Identifier** (for example `com.yourname.MyTestApp`). Paste it into your app in the Fewchurs
+dashboard. The API key only works there.
+
 ---
 
 ## Step 3: Add the Fewchurs package
@@ -196,7 +200,7 @@ Xcode shows these in red, next to the code or in the list on the left (⌘5).
 
 | What the app shows | What it means | How to fix it |
 |---|---|---|
-| **This app's API key is invalid. Please contact the developer.** | The key in `configure` is wrong, still the placeholder, or turned off. | Copy the key again from your dashboard (Step 1) and paste it exactly, keeping the quotes. |
+| **This app's API key is invalid. Please contact the developer.** | The key in `configure` is wrong, still the placeholder, or turned off. Or the key is locked to other apps (`wrong_app`): the grey line names the Bundle ID it saw. | Copy the key again from your dashboard (Step 1) and paste it exactly, keeping the quotes. For `wrong_app`, add your Bundle ID to your app in the dashboard. |
 | **Couldn't reach the server. Check your connection and try again.** | The phone or simulator is offline, or the server took too long to answer. | Check your Mac's internet connection and tap **Retry**. |
 | **You've reached today's limit for this. Please try again tomorrow.** | Each device can submit 15 requests and 10 comments a day. | Wait until tomorrow. On a simulator you can start fresh with **Device → Erase All Content and Settings…** (this deletes everything on that simulator). |
 | **This board isn't taking new requests right now.** | The server turned the request away because of the account. Plans don't block new requests, so this should be rare. | Check your account in the Fewchurs dashboard, or contact Fewchurs support. |
