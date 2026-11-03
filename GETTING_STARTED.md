@@ -58,7 +58,7 @@ dashboard. The API key only works there.
    https://github.com/fewchurs/fewchurs-swift
    ```
 
-3. Next to **Dependency Rule**, choose **Up to Next Major Version** and type `1.1.0`.
+3. Next to **Dependency Rule**, choose **Up to Next Major Version** and type `1.2.0`.
 4. Click **Add Package**. Wait for it to download.
 5. A second window asks which target gets **FeatureRequestKit**. Make sure your app is chosen
    in the **Add to Target** column, then click **Add Package** again.
@@ -188,7 +188,7 @@ Xcode shows these in red, next to the code or in the list on the left (⌘5).
 
 | What Xcode says | What it means | How to fix it |
 |---|---|---|
-| `No versions of 'fewchurs-swift' match the requirement 1.1.0..<2.0.0` | Version 1.1.0 hasn't been published yet. | Until it is, use **Add Local…** (see the tip in Step 3). First remove the old one: blue project icon → **PROJECT** → **Package Dependencies** → select it → **−**. |
+| `No versions of 'fewchurs-swift' match the requirement 1.2.0..<2.0.0` | Version 1.2.0 hasn't been published yet. | Until it is, use **Add Local…** (see the tip in Step 3). First remove the old one: blue project icon → **PROJECT** → **Package Dependencies** → select it → **−**. |
 | `compiling for iOS 16.0, but module 'FeatureRequestKit' has a minimum deployment target of iOS 17.0` | Your app is set to support iPhones older than the board does. | Set **Minimum Deployments** to **17.0** (see the end of Step 2). |
 | `No such module 'FeatureRequestKit'` | The package was downloaded but isn't connected to your app. | Click the blue project icon → **TARGETS** → your app → **General** → **Frameworks, Libraries, and Embedded Content** → **+** → choose **FeatureRequestKit** → **Add**. |
 | `Cannot find 'FeatureRequestKit' in scope` or `Cannot find 'FeatureRequestBoardView' in scope` | A file is missing the `import FeatureRequestKit` line. | Add `import FeatureRequestKit` near the top of that file, under `import SwiftUI`. |
