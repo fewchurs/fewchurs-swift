@@ -14,7 +14,7 @@ app step by step and lists every error you're likely to see, with the fix.
 ## Installation
 
 In Xcode: **File → Add Package Dependencies…**, paste the URL below, and choose
-**Up to Next Major Version** from `1.1.0`.
+**Up to Next Major Version** from `1.2.0`.
 
 ```
 https://github.com/fewchurs/fewchurs-swift
@@ -24,7 +24,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/fewchurs/fewchurs-swift", from: "1.1.0")
+    .package(url: "https://github.com/fewchurs/fewchurs-swift", from: "1.2.0")
 ]
 ```
 
