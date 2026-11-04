@@ -1,5 +1,5 @@
 import SwiftUI
-import FeatureRequestKit
+import Fewchurs
 
 struct ContentView: View {
     @State private var isPresentingBoard = false

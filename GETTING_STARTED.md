@@ -58,15 +58,15 @@ dashboard. The API key only works there.
    https://github.com/fewchurs/fewchurs-swift
    ```
 
-3. Next to **Dependency Rule**, choose **Up to Next Major Version** and type `1.2.0`.
+3. Next to **Dependency Rule**, choose **Up to Next Major Version** and type `2.0.0`.
 4. Click **Add Package**. Wait for it to download.
-5. A second window asks which target gets **FeatureRequestKit**. Make sure your app is chosen
+5. A second window asks which target gets **Fewchurs**. Make sure your app is chosen
    in the **Add to Target** column, then click **Add Package** again.
 
 You'll now see **Package Dependencies → fewchurs-swift** at the bottom of the left sidebar.
 
 > **Testing a version that isn't published yet?** If you have the package folder on your Mac
-> (for example `~/FeatureRequestKit`), use **File → Add Package Dependencies… → Add Local…**,
+> (for example `~/Fewchurs`), use **File → Add Package Dependencies… → Add Local…**,
 > pick that folder and click **Add Package**. Everything else in this guide is the same.
 
 ---
@@ -86,12 +86,12 @@ Replace all of its contents with the code below.
 
 ```swift
 import SwiftUI
-import FeatureRequestKit
+import Fewchurs
 
 @main
 struct MyTestAppApp: App {
     init() {
-        FeatureRequestKit.configure(apiKey: "fr_live_paste_your_key_here")
+        Fewchurs.configure(apiKey: "fr_live_paste_your_key_here")
     }
 
     var body: some Scene {
@@ -108,7 +108,7 @@ Replace all of its contents with:
 
 ```swift
 import SwiftUI
-import FeatureRequestKit
+import Fewchurs
 
 struct ContentView: View {
     @State private var showBoard = false
@@ -162,20 +162,20 @@ says **No Feature Requests Yet**. That's normal.
 - **Dark theme.** In your app file, change the `configure` line to:
 
   ```swift
-  FeatureRequestKit.configure(apiKey: "fr_live_…", theme: .midnight)
+  Fewchurs.configure(apiKey: "fr_live_…", theme: .midnight)
   ```
 
 - **Mark paying users.** If your app has subscriptions, the dashboard can show which ideas
   came from paying users:
 
   ```swift
-  FeatureRequestKit.configure(apiKey: "fr_live_…", isSubscriber: { /* return true for paying users */ false })
+  Fewchurs.configure(apiKey: "fr_live_…", isSubscriber: { /* return true for paying users */ false })
   ```
 
 - **Skip the email question.** If your app already knows the user's email:
 
   ```swift
-  FeatureRequestKit.identify(email: "jane@example.com")
+  Fewchurs.identify(email: "jane@example.com")
   ```
 
 ---
@@ -188,10 +188,10 @@ Xcode shows these in red, next to the code or in the list on the left (⌘5).
 
 | What Xcode says | What it means | How to fix it |
 |---|---|---|
-| `No versions of 'fewchurs-swift' match the requirement 1.2.0..<2.0.0` | Version 1.2.0 hasn't been published yet. | Until it is, use **Add Local…** (see the tip in Step 3). First remove the old one: blue project icon → **PROJECT** → **Package Dependencies** → select it → **−**. |
-| `compiling for iOS 16.0, but module 'FeatureRequestKit' has a minimum deployment target of iOS 17.0` | Your app is set to support iPhones older than the board does. | Set **Minimum Deployments** to **17.0** (see the end of Step 2). |
-| `No such module 'FeatureRequestKit'` | The package was downloaded but isn't connected to your app. | Click the blue project icon → **TARGETS** → your app → **General** → **Frameworks, Libraries, and Embedded Content** → **+** → choose **FeatureRequestKit** → **Add**. |
-| `Cannot find 'FeatureRequestKit' in scope` or `Cannot find 'FeatureRequestBoardView' in scope` | A file is missing the `import FeatureRequestKit` line. | Add `import FeatureRequestKit` near the top of that file, under `import SwiftUI`. |
+| `No versions of 'fewchurs-swift' match the requirement 2.0.0..<3.0.0` | Version 2.0.0 hasn't been published yet. | Until it is, use **Add Local…** (see the tip in Step 3). First remove the old one: blue project icon → **PROJECT** → **Package Dependencies** → select it → **−**. |
+| `compiling for iOS 16.0, but module 'Fewchurs' has a minimum deployment target of iOS 17.0` | Your app is set to support iPhones older than the board does. | Set **Minimum Deployments** to **17.0** (see the end of Step 2). |
+| `No such module 'Fewchurs'` | The package was downloaded but isn't connected to your app. | Click the blue project icon → **TARGETS** → your app → **General** → **Frameworks, Libraries, and Embedded Content** → **+** → choose **Fewchurs** → **Add**. |
+| `Cannot find 'Fewchurs' in scope` or `Cannot find 'FeatureRequestBoardView' in scope` | A file is missing the `import Fewchurs` line. | Add `import Fewchurs` near the top of that file, under `import SwiftUI`. |
 | `'main' attribute can only apply to one type in a module` or `Invalid redeclaration of 'ContentView'` | Some code was pasted twice, or into the wrong file. | Each file should contain only the code shown for it in Step 4. Delete anything else. |
 | Lots of errors about `UIKit`, `systemBackground` or `macOS` | You're building for a Mac instead of an iPhone. | Pick an **iPhone** simulator next to the ▶ button (Step 5). If you made a *Multiplatform* project, start again and pick **iOS → App** in Step 2. |
 | `Package Resolution Failed` / can't download | Xcode couldn't reach GitHub. | Check your internet connection, then **File → Packages → Reset Package Caches** and try again. |
@@ -207,7 +207,7 @@ Xcode shows these in red, next to the code or in the list on the left (⌘5).
 | **Something went wrong on our side. Please try again in a moment.** | The Fewchurs server had a problem. | Wait a minute and tap **Retry**. If it keeps happening, contact Fewchurs support. |
 | **Received an unexpected response. Please try again later.** | The app and the server disagree about something. | Make sure you're on the latest package version: **File → Packages → Update to Latest Package Versions**. |
 | **Request Not Found** | That request was deleted. | Nothing to fix. Go back to the list. |
-| The app **crashes** as soon as you open the board, and Xcode says `FeatureRequestBoardView was presented before FeatureRequestKit.configure(apiKey:) was called` | The `configure` line is missing or never runs. | Make sure your app file looks exactly like File 1 in Step 4, including the `init()` part. |
+| The app **crashes** as soon as you open the board, and Xcode says `FeatureRequestBoardView was presented before Fewchurs.configure(apiKey:) was called` | The `configure` line is missing or never runs. | Make sure your app file looks exactly like File 1 in Step 4, including the `init()` part. |
 
 **Small grey text under an error.** While you run from Xcode, some errors show a second, smaller
 line, such as `HTTP 502`. That's extra detail for developers. People who download your app from

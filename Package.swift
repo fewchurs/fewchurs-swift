@@ -2,20 +2,20 @@
 import PackageDescription
 
 let package = Package(
-    name: "FeatureRequestKit",
+    name: "Fewchurs",
     defaultLocalization: "en",
     platforms: [
         .iOS(.v17)
     ],
     products: [
         .library(
-            name: "FeatureRequestKit",
-            targets: ["FeatureRequestKit"]
+            name: "Fewchurs",
+            targets: ["Fewchurs"]
         ),
     ],
     targets: [
         .target(
-            name: "FeatureRequestKit",
+            name: "Fewchurs",
             resources: [
                 .copy("PrivacyInfo.xcprivacy"),
                 .process("Localizable.xcstrings")
@@ -25,8 +25,8 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "FeatureRequestKitTests",
-            dependencies: ["FeatureRequestKit"],
+            name: "FewchursTests",
+            dependencies: ["Fewchurs"],
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
             ]

@@ -1,4 +1,4 @@
-# FeatureRequestKit
+# Fewchurs
 
 The SwiftUI SDK for [Fewchurs](https://www.fewchurs.com): a drop-in feature request board for
 iOS apps. Your users see what's planned, vote on ideas, follow them, comment, and submit their own.
@@ -14,7 +14,7 @@ app step by step and lists every error you're likely to see, with the fix.
 ## Installation
 
 In Xcode: **File → Add Package Dependencies…**, paste the URL below, and choose
-**Up to Next Major Version** from `1.2.0`.
+**Up to Next Major Version** from `2.0.0`.
 
 ```
 https://github.com/fewchurs/fewchurs-swift
@@ -24,11 +24,11 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/fewchurs/fewchurs-swift", from: "1.2.0")
+    .package(url: "https://github.com/fewchurs/fewchurs-swift", from: "2.0.0")
 ]
 ```
 
-The library product and module are both called `FeatureRequestKit`.
+The library product and module are both called `Fewchurs`.
 
 ## Quick start
 
@@ -36,12 +36,12 @@ Configure once, when your app starts, with the API key from your Fewchurs dashbo
 
 ```swift
 import SwiftUI
-import FeatureRequestKit
+import Fewchurs
 
 @main
 struct MyApp: App {
     init() {
-        FeatureRequestKit.configure(apiKey: "fr_live_xxx")
+        Fewchurs.configure(apiKey: "fr_live_xxx")
     }
 
     var body: some Scene {
@@ -84,10 +84,10 @@ From UIKit, wrap it: `present(UIHostingController(rootView: FeatureRequestBoardV
 Every parameter except `apiKey` is optional.
 
 ```swift
-FeatureRequestKit.configure(
+Fewchurs.configure(
     apiKey: "fr_live_xxx",
     theme: .system,                            // colors and corner radius
-    baseURL: FeatureRequestKit.productionBaseURL, // the API to talk to
+    baseURL: Fewchurs.productionBaseURL, // the API to talk to
     isSubscriber: { Purchases.isPro }          // is the current user paying?
 )
 ```
@@ -103,7 +103,7 @@ The board follows the host app by default. Two themes are included, or build you
 | `FeatureRequestTheme(background:accent:cornerRadius:)` | Your own colors and corner radius |
 
 ```swift
-FeatureRequestKit.configure(apiKey: "fr_live_xxx", theme: .midnight)
+Fewchurs.configure(apiKey: "fr_live_xxx", theme: .midnight)
 ```
 
 ### Subscriber flag
@@ -124,8 +124,8 @@ pre-fills the email field when submitting and follows a request with one tap. If
 typed a different email into the board before, theirs wins.
 
 ```swift
-FeatureRequestKit.identify(email: currentUser.email)   // after sign-in
-FeatureRequestKit.identify(email: nil)                 // after sign-out
+Fewchurs.identify(email: currentUser.email)   // after sign-in
+Fewchurs.identify(email: nil)                 // after sign-out
 ```
 
 `identify` and `configure` can be called in any order. `identify(userId:email:)` still compiles but
@@ -206,10 +206,10 @@ to do about it.
 
 ## Testing the package
 
-Open `Package.swift` in Xcode and run the `FeatureRequestKit` scheme on an iOS Simulator, or:
+Open `Package.swift` in Xcode and run the `Fewchurs` scheme on an iOS Simulator, or:
 
 ```bash
-xcodebuild test -scheme FeatureRequestKit -destination 'platform=iOS Simulator,name=iPhone 17'
+xcodebuild test -scheme Fewchurs -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 
 Plain `swift build` / `swift test` won't work: the package uses UIKit-backed SwiftUI APIs that
@@ -220,7 +220,7 @@ network. There's also an opt-in **live contract test** that calls the real API a
 response. Use a key for a test app:
 
 ```bash
-TEST_RUNNER_FEWCHURS_CONTRACT_API_KEY=fr_live_xxx xcodebuild test -scheme FeatureRequestKit -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing FeatureRequestKitTests/LiveContractTests
+TEST_RUNNER_FEWCHURS_CONTRACT_API_KEY=fr_live_xxx xcodebuild test -scheme Fewchurs -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing FewchursTests/LiveContractTests
 ```
 
 It votes and follows, then undoes both. Add `TEST_RUNNER_FEWCHURS_CONTRACT_ALLOW_WRITES=1` to

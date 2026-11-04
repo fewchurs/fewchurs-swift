@@ -2,7 +2,7 @@ name: SampleApp
 options:
   bundleIdPrefix: com.featurerequestkit
 packages:
-  FeatureRequestKit:
+  Fewchurs:
     path: ../
 targets:
   SampleApp:
@@ -12,7 +12,7 @@ targets:
     sources:
       - path: Sources
     dependencies:
-      - package: FeatureRequestKit
+      - package: Fewchurs
     info:
       path: Generated/Info.plist
       properties:
