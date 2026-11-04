@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0
+
+### Changed
+
+- **Breaking:** the package, library product and module are now called `Fewchurs`, not
+  `FeatureRequestKit`. To upgrade, change `import FeatureRequestKit` to `import Fewchurs` and
+  `FeatureRequestKit.configure(...)` to `Fewchurs.configure(...)`, the same for `identify`. In
+  Xcode, also add the `Fewchurs` product to your app target. `FeatureRequestBoardView` and
+  `FeatureRequestTheme` keep their names, and devices keep their saved identity and votes.
+- Requests now send `X-Fewchurs-Sdk: swift/2.0.0`.
+
 ## 1.2.0
 
 ### Added

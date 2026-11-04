@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		ABB07478EB18EF03E84705CF /* SampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3A923993BA0E2E3F358A4A7 /* SampleApp.swift */; };
-		DE2999F6FB10010A085FECC2 /* FeatureRequestKit in Frameworks */ = {isa = PBXBuildFile; productRef = FED185A1353404D0D570F98B /* FeatureRequestKit */; };
+		DE2999F6FB10010A085FECC2 /* Fewchurs in Frameworks */ = {isa = PBXBuildFile; productRef = FED185A1353404D0D570F98B /* Fewchurs */; };
 		FF8B60AED61A5FA54D51A27B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4B73D55F781E1D6A0CC9F7 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -16,7 +16,7 @@
 		1E4B73D55F781E1D6A0CC9F7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A3A923993BA0E2E3F358A4A7 /* SampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleApp.swift; sourceTree = "<group>"; };
 		DD0E01F9D77DC91660EB290F /* SampleApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E17C7B8925B301ED32CFCC33 /* FeatureRequestKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FeatureRequestKit; path = ..; sourceTree = SOURCE_ROOT; };
+		E17C7B8925B301ED32CFCC33 /* Fewchurs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fewchurs; path = ..; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -24,7 +24,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DE2999F6FB10010A085FECC2 /* FeatureRequestKit in Frameworks */,
+				DE2999F6FB10010A085FECC2 /* Fewchurs in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,7 +60,7 @@
 		E4F3AF9EA173644759DEF899 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				E17C7B8925B301ED32CFCC33 /* FeatureRequestKit */,
+				E17C7B8925B301ED32CFCC33 /* Fewchurs */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -89,7 +89,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				FED185A1353404D0D570F98B /* FeatureRequestKit */,
+				FED185A1353404D0D570F98B /* Fewchurs */,
 			);
 			productName = SampleApp;
 			productReference = DD0E01F9D77DC91660EB290F /* SampleApp.app */;
@@ -333,9 +333,9 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		FED185A1353404D0D570F98B /* FeatureRequestKit */ = {
+		FED185A1353404D0D570F98B /* Fewchurs */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = FeatureRequestKit;
+			productName = Fewchurs;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
