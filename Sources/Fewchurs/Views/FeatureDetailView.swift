@@ -11,7 +11,7 @@ struct FeatureDetailView: View {
     /// Owns its model via `@State`, seeded once from stable inputs. `navigationDestination(for:)`
     /// re-invokes its closure on unrelated parent re-renders (e.g. any `boardModel.features`
     /// mutation), so building the model directly in that closure would silently discard
-    /// in-progress comment state — `@State` preserves it across those re-invocations.
+    /// in-progress comment states — `@State` preserves it across those re-invocations.
     init(featureId: String, boardModel: FeatureBoardModel) {
         _model = State(initialValue: FeatureDetailModel(featureId: featureId, boardModel: boardModel))
     }
